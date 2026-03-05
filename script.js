@@ -338,7 +338,7 @@
             setTimeout(function () { animateCounters(page); }, 400);
         }
 
-        if (pageId === 'page-contact') {
+        if (pageId === 'page-salon') {
             setTimeout(initContactMap, 300);
         }
 

@@ -10,6 +10,7 @@ Thumbs.db
 .claude/
 
 # Source files (not needed for deployment)
+CElia vid*.mp4
 *.pdf
 *.docx
 *.MOV

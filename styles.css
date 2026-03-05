@@ -820,6 +820,39 @@ button {
    GALLERY PAGE
    ======================================== */
 
+.gallery-hero {
+    position: relative;
+    width: 100%;
+    height: 55vh;
+    overflow: hidden;
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    margin-bottom: var(--space-lg);
+}
+
+.gallery-hero__video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.gallery-hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.55) 0%, transparent 50%);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: var(--space-xl) var(--space-md);
+}
+
+.gallery-hero__subtitle {
+    font-family: var(--font-sub);
+    font-size: 1.25rem;
+    color: #fff;
+    letter-spacing: 0.04em;
+    text-align: center;
+}
+
 .gallery {
     column-count: 2;
     column-gap: 8px;
@@ -960,6 +993,35 @@ button {
     display: flex;
     flex-direction: column;
     gap: var(--space-md);
+}
+
+/* Salon page section divider */
+.salon-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-2xl) 0;
+}
+
+.salon-divider::before,
+.salon-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(201, 169, 110, 0.3), transparent);
+}
+
+.salon-divider__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(201, 169, 110, 0.08);
+    border: 1px solid rgba(201, 169, 110, 0.15);
+    margin: 0 var(--space-md);
+    flex-shrink: 0;
 }
 
 /* ========================================
