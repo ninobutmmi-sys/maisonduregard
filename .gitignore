@@ -1,0 +1,40 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Claude
+.claude/
+
+# Source files (not needed for deployment)
+*.pdf
+*.docx
+*.MOV
+*.png
+PRD-Maison-du-Regard.md
+PROJET-COMPLET.md
+
+# Raw photos at root (already processed in assets/images/)
+1.jpg
+Gros plan celya qui travail.jpg
+Image presta.jpeg
+Image presta.jpg
+image.jpeg
+Photo cabinet celia.jpg
+Photo celya qui travaille pro .jpg
+Photo coin attente cabinet celya.jpg
+Photo pro, on voit celya travailler.jpg
+photo travail celia.jpg
+photo.jpg
+photos .jpg
+Presta celya.jpg
+presta.jpg
+sourcils.jpg
+sourcilss.jpg
+travail sourcil.jpg
+Vue photo pro clya qui travail zoom main outil.jpg
+WhatsApp Image 2026-02-27 at 16.54.46.jpeg
+Zoom sourcil browlift.jpg
