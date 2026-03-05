@@ -39,3 +39,10 @@ travail sourcil.jpg
 Vue photo pro clya qui travail zoom main outil.jpg
 WhatsApp Image 2026-02-27 at 16.54.46.jpeg
 Zoom sourcil browlift.jpg
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
