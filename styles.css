@@ -90,10 +90,17 @@ body {
     color: var(--color-text);
     background: var(--color-bg);
     line-height: 1.6;
+    overflow-y: auto;
+    position: relative;
+    overscroll-behavior: none;
+    padding-bottom: var(--nav-height);
+}
+
+body[data-page="home"] {
     overflow: hidden;
     position: fixed;
     inset: 0;
-    overscroll-behavior: none;
+    padding-bottom: 0;
 }
 
 img {
@@ -172,39 +179,37 @@ button {
 
 /* --- App Container --- */
 .app {
-    position: fixed;
-    inset: 0;
-    overflow: hidden;
+    position: relative;
+    min-height: 100vh;
 }
 
 /* --- Page System --- */
 .page {
-    position: absolute;
-    inset: 0;
-    overflow-y: auto;
+    position: relative;
+    min-height: 100vh;
     overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
     background: var(--color-bg);
-    z-index: var(--z-page);
-    transform: translateY(100%);
-    transition: transform var(--duration-slow) var(--ease-out);
-    visibility: hidden;
 }
 
-.page--home {
-    transform: translateY(0);
-    z-index: 0;
-    visibility: visible;
+/* --- Page entry animation --- */
+.page__body {
+    animation: fadeUp 0.5s var(--ease-out);
 }
 
-.page.active {
-    transform: translateY(0);
-    z-index: var(--z-page-active);
-    visibility: visible;
+/* --- Active nav state by body data-page --- */
+body[data-page="home"] [data-nav="home"],
+body[data-page="soins"] [data-nav="soins"],
+body[data-page="salon"] [data-nav="salon"],
+body[data-page="galerie"] [data-nav="galerie"] {
+    color: #1c1c1c;
 }
 
-.page--home.active {
-    z-index: 0;
+body[data-page="home"] [data-nav="home"] svg,
+body[data-page="soins"] [data-nav="soins"] svg,
+body[data-page="salon"] [data-nav="salon"] svg,
+body[data-page="galerie"] [data-nav="galerie"] svg {
+    stroke: #1c1c1c;
+    stroke-width: 1.9;
 }
 
 /* Sub-page: pad for bottom nav */
@@ -236,6 +241,8 @@ button {
     background: rgba(252, 182, 159, 0.1);
     border: 1px solid rgba(252, 182, 159, 0.2);
     transition: background var(--duration-fast), transform var(--duration-fast);
+    text-decoration: none;
+    color: var(--color-text);
 }
 
 .page__back:hover {
@@ -271,6 +278,9 @@ button {
 .page--home {
     overflow: hidden;
     background: #2a1f1a;
+    position: relative;
+    height: 100vh;
+    height: 100dvh;
 }
 
 .hero__video {
@@ -375,6 +385,52 @@ button {
 
 .hero__badge svg {
     flex-shrink: 0;
+}
+
+/* ========================================
+   HOME INTRO SECTION
+   ======================================== */
+
+.home-intro {
+    background: var(--color-bg);
+    padding: var(--space-3xl) var(--space-lg);
+}
+
+.section__title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.home-intro__text {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-md);
+}
+
+.home-intro__text a {
+    color: var(--color-gold-dark);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.home-intro__text a:hover {
+    color: var(--color-gold);
+}
+
+.home-intro__text strong {
+    color: var(--color-text);
+    font-weight: 500;
+}
+
+.home-intro__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    justify-content: center;
+    margin-top: var(--space-xl);
 }
 
 /* ========================================
@@ -1833,6 +1889,87 @@ button {
     .preloader {
         display: none;
     }
+}
+
+/* ========================================
+   BREADCRUMB
+   ======================================== */
+
+.breadcrumb {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-lg);
+    padding: 0 var(--space-lg);
+}
+
+.breadcrumb a {
+    color: var(--color-gold-dark);
+    text-decoration: none;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+/* ========================================
+   FAQ
+   ======================================== */
+
+.faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin: var(--space-lg) 0;
+}
+
+.faq-item {
+    background: var(--color-bg-elevated);
+    border: 1px solid rgba(252, 182, 159, 0.15);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.faq-item__question {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--color-text);
+    padding: var(--space-md) var(--space-lg);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+}
+
+.faq-item__question::-webkit-details-marker {
+    display: none;
+}
+
+.faq-item__question::after {
+    content: '+';
+    font-size: 1.2rem;
+    color: var(--color-gold);
+    flex-shrink: 0;
+    transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.faq-item[open] .faq-item__question::after {
+    content: '\2212';
+}
+
+.faq-item__answer {
+    padding: 0 var(--space-lg) var(--space-lg);
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--color-text-muted);
+}
+
+.faq-item__answer a {
+    color: var(--color-gold-dark);
+    text-decoration: underline;
+    text-underline-offset: 2px;
 }
 
 /* ========================================

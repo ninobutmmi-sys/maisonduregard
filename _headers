@@ -13,3 +13,21 @@
 
 /*.js
   Cache-Control: public, max-age=86400
+
+/salon/*
+  Cache-Control: public, max-age=3600
+
+/soins/*
+  Cache-Control: public, max-age=3600
+
+/galerie/*
+  Cache-Control: public, max-age=3600
+
+/avis/*
+  Cache-Control: public, max-age=3600
+
+/faq/*
+  Cache-Control: public, max-age=3600
+
+/mentions-legales/*
+  Cache-Control: public, max-age=86400
