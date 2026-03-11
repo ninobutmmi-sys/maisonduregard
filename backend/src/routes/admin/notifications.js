@@ -65,8 +65,8 @@ router.get('/logs', async (req, res) => {
 
     const result = await db.query(
       `SELECT nq.id, nq.type, nq.status, nq.created_at, nq.sent_at,
-              nq.attempts, nq.last_error, nq.channel, nq.phone AS nq_phone,
-              nq.recipient_name, nq.message, nq.email AS nq_email, nq.subject,
+              nq.attempts, nq.last_error, nq.channel, nq.recipient,
+              nq.recipient_name, nq.content, nq.subject,
               c.first_name, c.last_name, c.phone, c.email
        FROM notification_queue nq
        LEFT JOIN bookings b ON nq.booking_id = b.id

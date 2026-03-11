@@ -14,7 +14,7 @@ export default function SystemHealth() {
     try {
       const [healthRes, statusRes] = await Promise.all([
         api.get('/health').catch(() => null),
-        api.get('/admin/system/status').catch(() => null),
+        api.get('/admin/system/health').catch(() => null),
       ]);
 
       setHealth(healthRes);
@@ -37,7 +37,13 @@ export default function SystemHealth() {
 
   // Cron jobs from system status
   const crons = status?.crons || status?.cronStatus || {};
-  const memory = status?.memory || {};
+  const rawMem = status?.memory || {};
+  const memory = {
+    rss: rawMem.rssMB ? rawMem.rssMB * 1024 * 1024 : rawMem.rss,
+    heapUsed: rawMem.heapUsedMB ? rawMem.heapUsedMB * 1024 * 1024 : rawMem.heapUsed,
+    heapTotal: rawMem.heapTotalMB ? rawMem.heapTotalMB * 1024 * 1024 : rawMem.heapTotal,
+    external: rawMem.external,
+  };
   const notifications = status?.notifications || {};
   const circuitBreaker = status?.circuitBreaker || status?.brevo || {};
 
@@ -120,7 +126,7 @@ export default function SystemHealth() {
           <div className="health-info">
             <div className="health-label">File de notifications</div>
             <div className="health-value">
-              {notifications.pending || 0} en attente, {notifications.failed || 0} echouee{(notifications.failed || 0) > 1 ? 's' : ''}
+              {notifications.pending || 0} en attente, {notifications.email_failed || notifications.failed || 0} echouee{(notifications.email_failed || notifications.failed || 0) > 1 ? 's' : ''}
             </div>
           </div>
         </div>
