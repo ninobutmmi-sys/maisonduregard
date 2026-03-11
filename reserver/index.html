@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Prendre rendez-vous | Maison du Regard</title>
+    <meta name="description" content="Reservez votre soin sourcils, cils ou maquillage permanent en ligne a la Maison du Regard a Corenc pres de Grenoble. Choisissez votre prestation, date et horaire.">
+    <meta name="theme-color" content="#FFF5F0">
+    <meta property="og:title" content="Prendre rendez-vous | Maison du Regard">
+    <meta property="og:description" content="Reservez votre soin en ligne. Sourcils, maquillage permanent, extensions de cils a Corenc pres de Grenoble.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://lamaisonduregard.fr/reserver/">
+    <link rel="canonical" href="https://lamaisonduregard.fr/reserver/">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+    <link rel="stylesheet" href="/styles.css">
+
+    <style>
+    /* ===== Booking-specific styles ===== */
+
+    .booking { padding-bottom: 120px; }
+
+    /* --- Progress bar --- */
+    .progress { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 16px 0 8px; }
+    .progress__step { width: 10px; height: 10px; border-radius: 50%; background: #F0E0D6; transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
+    .progress__step--active { width: 12px; height: 12px; background: var(--color-gold); box-shadow: 0 0 0 4px rgba(201, 169, 110, 0.15); }
+    .progress__step--done { background: var(--color-gold); }
+    .progress__line { width: 40px; height: 2px; background: #F0E0D6; transition: background 0.35s; }
+    .progress__line--done { background: var(--color-gold); }
+
+    /* --- Steps --- */
+    .step { display: none; animation: fadeUp 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+    .step--active { display: block; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+    .step__title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--color-text); text-align: center; margin-bottom: var(--space-lg); }
+
+    /* --- Category tabs --- */
+    .cat-tabs { display: flex; gap: 8px; margin-bottom: var(--space-lg); overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding: 2px 0; }
+    .cat-tabs::-webkit-scrollbar { display: none; }
+    .cat-tab { flex-shrink: 0; padding: 8px 18px; border-radius: var(--radius-full); border: 1.5px solid #F0E0D6; background: transparent; font-family: var(--font-body); font-size: 0.82rem; font-weight: 500; color: var(--color-text); cursor: pointer; transition: all 0.3s; white-space: nowrap; }
+    .cat-tab:hover { border-color: var(--color-gold); }
+    .cat-tab--active { background: var(--color-gold); color: #fff; border-color: var(--color-gold); }
+
+    /* --- Service cards --- */
+    .service-list { display: flex; flex-direction: column; gap: 10px; }
+    .service-card { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: #fff; border: 1.5px solid #F0E0D6; border-radius: var(--radius-lg); cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .service-card:hover { border-color: var(--color-gold-light); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(201, 169, 110, 0.1); }
+    .service-card--selected { border-color: var(--color-gold); background: rgba(201, 169, 110, 0.06); box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.12); }
+    .service-card--popular { position: relative; }
+    .service-card__badge { position: absolute; top: -8px; left: 16px; padding: 2px 10px; background: var(--gradient-cta); color: #fff; font-family: var(--font-body); font-size: 0.65rem; font-weight: 600; border-radius: var(--radius-full); letter-spacing: 0.5px; text-transform: uppercase; }
+    .service-card__radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #ddd; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.25s; }
+    .service-card--selected .service-card__radio { border-color: var(--color-gold); }
+    .service-card--selected .service-card__radio::after { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--color-gold); }
+    .service-card__info { flex: 1; min-width: 0; }
+    .service-card__name { font-family: var(--font-body); font-weight: 600; font-size: 0.88rem; color: var(--color-text); margin: 0 0 2px; }
+    .service-card__duration { font-family: var(--font-body); font-size: 0.75rem; color: var(--color-text-muted); }
+    .service-card__price { font-family: var(--font-display); font-weight: 600; font-size: 1rem; color: var(--color-text); white-space: nowrap; }
+
+    /* --- Calendar --- */
+    .calendar { background: #fff; border-radius: var(--radius-lg); border: 1px solid #F0E0D6; padding: 16px; margin-bottom: var(--space-lg); }
+    .calendar__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .calendar__month { font-family: var(--font-display); font-size: 1rem; font-weight: 600; color: var(--color-text); }
+    .calendar__nav { width: 36px; height: 36px; border-radius: 50%; border: 1px solid #F0E0D6; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.25s; color: var(--color-text); }
+    .calendar__nav:hover { border-color: var(--color-gold); color: var(--color-gold); }
+    .calendar__nav:disabled { opacity: 0.3; cursor: not-allowed; }
+    .calendar__days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; margin-bottom: 8px; }
+    .calendar__day-name { font-family: var(--font-body); font-size: 0.7rem; font-weight: 600; color: var(--color-text-muted); padding: 4px 0; text-transform: uppercase; letter-spacing: 0.5px; }
+    .calendar__grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .calendar__date { width: 100%; aspect-ratio: 1; border-radius: 50%; border: none; background: transparent; font-family: var(--font-body); font-size: 0.82rem; font-weight: 500; color: var(--color-text); cursor: pointer; transition: all 0.25s; display: flex; align-items: center; justify-content: center; }
+    .calendar__date:hover:not(:disabled):not(.calendar__date--selected) { background: rgba(201, 169, 110, 0.1); }
+    .calendar__date--selected { background: var(--color-gold); color: #fff; font-weight: 600; }
+    .calendar__date--today { font-weight: 700; position: relative; }
+    .calendar__date--today::after { content: ''; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: var(--color-gold); }
+    .calendar__date--today.calendar__date--selected::after { background: #fff; }
+    .calendar__date:disabled { color: #ccc; cursor: not-allowed; }
+    .calendar__date--empty { cursor: default; }
+
+    /* --- Time slots --- */
+    .slots-label { font-family: var(--font-body); font-size: 0.85rem; font-weight: 600; color: var(--color-text); margin-bottom: 12px; }
+    .slots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: var(--space-lg); }
+    @media (min-width: 480px) { .slots-grid { grid-template-columns: repeat(4, 1fr); } }
+    .slot-btn { padding: 10px 8px; border-radius: var(--radius-md); border: 1.5px solid #F0E0D6; background: #fff; font-family: var(--font-body); font-size: 0.85rem; font-weight: 500; color: var(--color-text); cursor: pointer; transition: all 0.25s; text-align: center; }
+    .slot-btn:hover { border-color: var(--color-gold-light); }
+    .slot-btn--selected { background: var(--color-gold); color: #fff; border-color: var(--color-gold); font-weight: 600; }
+    .slots-empty { text-align: center; padding: 32px 16px; color: var(--color-text-muted); font-family: var(--font-body); font-size: 0.88rem; }
+    .slots-loading { text-align: center; padding: 32px 16px; color: var(--color-text-muted); font-family: var(--font-body); font-size: 0.85rem; }
+
+    /* --- Form --- */
+    .form-group { margin-bottom: var(--space-md); }
+    .form-label { display: block; font-family: var(--font-body); font-size: 0.8rem; font-weight: 600; color: var(--color-text); margin-bottom: 6px; }
+    .form-label .optional { font-weight: 400; color: var(--color-text-muted); font-size: 0.75rem; }
+    .form-input { width: 100%; padding: 12px 16px; border: 1.5px solid #F0E0D6; border-radius: var(--radius-md); font-family: var(--font-body); font-size: 16px; color: var(--color-text); background: #fff; transition: border-color 0.25s; -webkit-appearance: none; box-sizing: border-box; }
+    .form-input:focus { outline: none; border-color: var(--color-gold); box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.12); }
+    .form-input::placeholder { color: #bbb; }
+    .form-error { font-family: var(--font-body); font-size: 0.75rem; color: #e74c3c; margin-top: 4px; display: none; }
+    .form-error--visible { display: block; }
+
+    /* --- Recap --- */
+    .recap { background: #fff; border: 1.5px solid #F0E0D6; border-radius: var(--radius-lg); padding: 20px; margin-bottom: var(--space-lg); }
+    .recap__title { font-family: var(--font-display); font-size: 1rem; font-weight: 600; color: var(--color-text); margin-bottom: 14px; }
+    .recap__row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #F8F0EC; }
+    .recap__row:last-child { border-bottom: none; }
+    .recap__label { font-family: var(--font-body); font-size: 0.82rem; color: var(--color-text-muted); }
+    .recap__value { font-family: var(--font-body); font-size: 0.88rem; font-weight: 600; color: var(--color-text); text-align: right; }
+    .recap__price { font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; color: var(--color-gold); }
+
+    /* --- Buttons --- */
+    .booking-btn { width: 100%; padding: 14px 24px; border: none; border-radius: var(--radius-full); font-family: var(--font-body); font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
+    .booking-btn--primary { background: var(--gradient-cta); color: #fff; box-shadow: 0 4px 20px rgba(255, 154, 158, 0.3); }
+    .booking-btn--primary:hover:not(:disabled) { box-shadow: 0 6px 28px rgba(255, 154, 158, 0.4); transform: translateY(-1px); }
+    .booking-btn--primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+    .booking-btn--secondary { background: transparent; color: var(--color-text); border: 1.5px solid #F0E0D6; }
+    .booking-btn--secondary:hover { border-color: var(--color-gold); color: var(--color-gold); }
+    .btn-row { display: flex; gap: 10px; margin-top: var(--space-lg); }
+    .btn-row .booking-btn { flex: 1; }
+    .btn-row .booking-btn--secondary { flex: 0.6; }
+
+    /* --- Success --- */
+    .success { text-align: center; padding: var(--space-xl) 0; animation: fadeUp 0.5s; }
+    .success__icon { width: 64px; height: 64px; border-radius: 50%; background: rgba(74, 222, 128, 0.12); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-lg); }
+    .success__title { font-family: var(--font-display); font-size: 1.4rem; font-weight: 600; color: var(--color-text); margin-bottom: var(--space-sm); }
+    .success__subtitle { font-family: var(--font-body); font-size: 0.88rem; color: var(--color-text-muted); margin-bottom: var(--space-xl); line-height: 1.6; }
+    .success__detail { font-family: var(--font-body); font-size: 0.85rem; color: var(--color-text); margin-bottom: 6px; }
+    .success__detail strong { font-weight: 600; }
+    .success__actions { margin-top: var(--space-xl); display: flex; flex-direction: column; gap: 10px; }
+
+    /* --- Error toast --- */
+    .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #e74c3c; color: #fff; padding: 12px 20px; border-radius: var(--radius-md); font-family: var(--font-body); font-size: 0.85rem; font-weight: 500; z-index: 9999; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); max-width: 90%; text-align: center; }
+    .toast--visible { transform: translateX(-50%) translateY(0); }
+
+    /* --- Loading spinner --- */
+    .spinner { display: inline-block; width: 20px; height: 20px; border: 2.5px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 8px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body data-page="reserver">
+    <div class="app">
+        <div class="page page--sub">
+            <header class="page__header">
+                <a class="page__back" href="/" id="back-btn" aria-label="Retour">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </a>
+                <h2 class="page__title">Rendez-vous</h2>
+                <div class="page__header-spacer"></div>
+            </header>
+
+            <div class="page__body booking">
+
+                <!-- Progress -->
+                <div class="progress" id="progress">
+                    <div class="progress__step progress__step--active" data-step="1"></div>
+                    <div class="progress__line" data-line="1"></div>
+                    <div class="progress__step" data-step="2"></div>
+                    <div class="progress__line" data-line="2"></div>
+                    <div class="progress__step" data-step="3"></div>
+                </div>
+
+                <!-- ===== STEP 1: Choix prestation ===== -->
+                <div class="step step--active" id="step-1">
+                    <h1 class="step__title">Choisissez votre prestation</h1>
+
+                    <div class="cat-tabs" id="cat-tabs">
+                        <button class="cat-tab cat-tab--active" data-category="sourcils" type="button">Sourcils</button>
+                        <button class="cat-tab" data-category="permanent" type="button">Maquillage Permanent</button>
+                        <button class="cat-tab" data-category="cils" type="button">Cils</button>
+                    </div>
+
+                    <div class="service-list" id="service-list">
+                        <div class="slots-loading">Chargement des prestations...</div>
+                    </div>
+
+                    <div class="btn-row" style="margin-top: var(--space-xl);">
+                        <button class="booking-btn booking-btn--primary" id="btn-step1-next" disabled type="button">Suivant</button>
+                    </div>
+                </div>
+
+                <!-- ===== STEP 2: Choix creneau ===== -->
+                <div class="step" id="step-2">
+                    <h1 class="step__title">Choisissez votre creneau</h1>
+
+                    <div class="calendar" id="calendar">
+                        <div class="calendar__header">
+                            <button class="calendar__nav" id="cal-prev" type="button" aria-label="Mois precedent">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                            </button>
+                            <span class="calendar__month" id="cal-month"></span>
+                            <button class="calendar__nav" id="cal-next" type="button" aria-label="Mois suivant">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                            </button>
+                        </div>
+                        <div class="calendar__days">
+                            <span class="calendar__day-name">Lun</span>
+                            <span class="calendar__day-name">Mar</span>
+                            <span class="calendar__day-name">Mer</span>
+                            <span class="calendar__day-name">Jeu</span>
+                            <span class="calendar__day-name">Ven</span>
+                            <span class="calendar__day-name">Sam</span>
+                            <span class="calendar__day-name">Dim</span>
+                        </div>
+                        <div class="calendar__grid" id="cal-grid"></div>
+                    </div>
+
+                    <div id="slots-container" style="display:none;">
+                        <p class="slots-label" id="slots-label"></p>
+                        <div id="slots-content"></div>
+                    </div>
+
+                    <div class="btn-row">
+                        <button class="booking-btn booking-btn--secondary" id="btn-step2-back" type="button">Retour</button>
+                        <button class="booking-btn booking-btn--primary" id="btn-step2-next" disabled type="button">Suivant</button>
+                    </div>
+                </div>
+
+                <!-- ===== STEP 3: Informations ===== -->
+                <div class="step" id="step-3">
+                    <h1 class="step__title">Vos informations</h1>
+
+                    <div class="recap" id="recap">
+                        <p class="recap__title">Recapitulatif</p>
+                        <div class="recap__row"><span class="recap__label">Prestation</span><span class="recap__value" id="recap-service"></span></div>
+                        <div class="recap__row"><span class="recap__label">Date</span><span class="recap__value" id="recap-date"></span></div>
+                        <div class="recap__row"><span class="recap__label">Heure</span><span class="recap__value" id="recap-time"></span></div>
+                        <div class="recap__row"><span class="recap__label">Duree</span><span class="recap__value" id="recap-duration"></span></div>
+                        <div class="recap__row"><span class="recap__label">Prix</span><span class="recap__value recap__price" id="recap-price"></span></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="input-firstname">Prenom</label>
+                        <input class="form-input" type="text" id="input-firstname" placeholder="Votre prenom" autocomplete="given-name" required>
+                        <p class="form-error" id="err-firstname">Veuillez entrer votre prenom</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="input-phone">Telephone</label>
+                        <input class="form-input" type="tel" id="input-phone" placeholder="06 XX XX XX XX" autocomplete="tel" required>
+                        <p class="form-error" id="err-phone">Veuillez entrer un numero de telephone valide</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="input-email">Email <span class="optional">(optionnel)</span></label>
+                        <input class="form-input" type="email" id="input-email" placeholder="votre@email.com" autocomplete="email">
+                        <p class="form-error" id="err-email">Veuillez entrer un email valide</p>
+                    </div>
+
+                    <div class="btn-row">
+                        <button class="booking-btn booking-btn--secondary" id="btn-step3-back" type="button">Retour</button>
+                        <button class="booking-btn booking-btn--primary" id="btn-step3-confirm" type="button">Confirmer le rendez-vous</button>
+                    </div>
+                </div>
+
+                <!-- ===== SUCCESS ===== -->
+                <div class="step" id="step-success">
+                    <div class="success">
+                        <div class="success__icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                        <h2 class="success__title">Rendez-vous confirme !</h2>
+                        <p class="success__subtitle">Vous recevrez un email de confirmation avec tous les details de votre rendez-vous.</p>
+                        <div id="success-details"></div>
+                        <div class="success__actions">
+                            <a class="booking-btn booking-btn--primary" href="/" style="display:block; text-align:center; text-decoration:none;">Retour a l'accueil</a>
+                            <a class="booking-btn booking-btn--secondary" href="/soins/" style="display:block; text-align:center; text-decoration:none;">Voir nos soins</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Cookie Banner -->
+    <div class="cookie-banner" id="cookie-banner">
+        <p>Ce site utilise des cookies techniques pour son bon fonctionnement.</p>
+        <div class="cookie-banner__actions">
+            <button class="cookie-banner__btn cookie-banner__btn--accept" id="cookie-accept" type="button">Accepter</button>
+            <button class="cookie-banner__btn" id="cookie-legal" type="button">En savoir plus</button>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav" aria-label="Navigation rapide">
+        <a class="bottom-nav__item" href="/" data-nav="home">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Accueil</span>
+        </a>
+        <a class="bottom-nav__item" href="/soins/" data-nav="soins">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+            <span>Soins</span>
+        </a>
+        <a class="bottom-nav__item bottom-nav__item--cta bottom-nav__item--active" href="/reserver/" aria-label="Prendre rendez-vous">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+            <span>RDV</span>
+        </a>
+        <a class="bottom-nav__item" href="/salon/" data-nav="salon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V13h6v8"/></svg>
+            <span>Salon</span>
+        </a>
+        <a class="bottom-nav__item" href="/galerie/" data-nav="galerie">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            <span>Galerie</span>
+        </a>
+    </nav>
+
+    <script src="/script.js"></script>
+    <script>
+    (function () {
+        'use strict';
+
+        /** @type {string} */
+        var API_URL = window.location.hostname === 'localhost'
+            ? 'http://localhost:3000/api'
+            : 'https://api.lamaisonduregard.fr/api';
+
+        // --- State ---
+        var currentStep = 1;
+        var services = [];
+        var selectedService = null;
+        var selectedDate = null;
+        var selectedTime = null;
+        var calendarMonth = new Date();
+        calendarMonth.setDate(1);
+
+        // French month names
+        var MONTHS = ['Janvier', 'Fevrier', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Aout', 'Septembre', 'Octobre', 'Novembre', 'Decembre'];
+
+        // Category mapping (service category_name or manual keyword match)
+        var CATEGORIES = {
+            sourcils: ['restructuration', 'entretien', 'teinture sourcils', 'browlift', 'epilation'],
+            permanent: ['microshading', 'microblading', 'mixte', 'retouche'],
+            cils: ['rehaussement', 'extensions', 'volume russe', 'pickos', 'remplissage', 'depose', 'cil']
+        };
+
+        // Popular service keywords
+        var POPULAR = ['browlift + teinture', 'browlift', 'mixte', 'rehaussement + teinture', 'rehaussement et teinture'];
+
+        // --- DOM ---
+        var $backBtn = document.getElementById('back-btn');
+        var $progress = document.getElementById('progress');
+        var $serviceList = document.getElementById('service-list');
+        var $catTabs = document.getElementById('cat-tabs');
+        var $calGrid = document.getElementById('cal-grid');
+        var $calMonth = document.getElementById('cal-month');
+        var $calPrev = document.getElementById('cal-prev');
+        var $calNext = document.getElementById('cal-next');
+        var $slotsContainer = document.getElementById('slots-container');
+        var $slotsLabel = document.getElementById('slots-label');
+        var $slotsContent = document.getElementById('slots-content');
+        var $toast = document.getElementById('toast');
+
+        // --- Utility ---
+
+        /**
+         * Show a toast error message
+         * @param {string} msg
+         */
+        function showToast(msg) {
+            $toast.textContent = msg;
+            $toast.classList.add('toast--visible');
+            setTimeout(function () { $toast.classList.remove('toast--visible'); }, 4000);
+        }
+
+        /**
+         * Format price in cents to display
+         * @param {number} price - price in cents
+         * @returns {string}
+         */
+        function formatPrice(price) {
+            if (price % 100 === 0) return (price / 100) + '\u20ac';
+            return (price / 100).toFixed(2).replace('.', ',') + '\u20ac';
+        }
+
+        /**
+         * Format date to readable French
+         * @param {string} dateStr - YYYY-MM-DD
+         * @returns {string}
+         */
+        function formatDateFr(dateStr) {
+            var parts = dateStr.split('-');
+            var days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+            var d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            return days[d.getDay()] + ' ' + parseInt(parts[2]) + ' ' + MONTHS[parseInt(parts[1]) - 1];
+        }
+
+        /**
+         * Categorize a service by name
+         * @param {string} name
+         * @returns {string}
+         */
+        function categorize(name) {
+            var lower = name.toLowerCase();
+            if (CATEGORIES.cils.some(function (k) { return lower.includes(k); })) return 'cils';
+            if (CATEGORIES.permanent.some(function (k) { return lower.includes(k); })) return 'permanent';
+            return 'sourcils';
+        }
+
+        /**
+         * Check if service is popular
+         * @param {string} name
+         * @returns {boolean}
+         */
+        function isPopular(name) {
+            var lower = name.toLowerCase();
+            return POPULAR.some(function (k) { return lower.includes(k); });
+        }
+
+        // --- Navigation ---
+
+        function goToStep(step) {
+            currentStep = step;
+
+            // Show/hide steps
+            document.querySelectorAll('.step').forEach(function (el) { el.classList.remove('step--active'); });
+            var target = document.getElementById(step === 4 ? 'step-success' : 'step-' + step);
+            if (target) target.classList.add('step--active');
+
+            // Update progress
+            for (var i = 1; i <= 3; i++) {
+                var dot = $progress.querySelector('[data-step="' + i + '"]');
+                var line = $progress.querySelector('[data-line="' + (i - 1) + '"]');
+                dot.classList.toggle('progress__step--active', i === step);
+                dot.classList.toggle('progress__step--done', i < step);
+                if (line) line.classList.toggle('progress__line--done', i <= step);
+            }
+
+            // Update back button
+            if (step === 1) {
+                $backBtn.href = '/';
+            } else if (step <= 3) {
+                $backBtn.href = '#';
+                $backBtn.onclick = function (e) { e.preventDefault(); goToStep(step - 1); };
+            }
+
+            // Hide progress on success
+            $progress.style.display = step === 4 ? 'none' : '';
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- Step 1: Services ---
+
+        async function loadServices() {
+            try {
+                var res = await fetch(API_URL + '/services');
+                if (!res.ok) throw new Error('Erreur serveur');
+                var data = await res.json();
+                services = Array.isArray(data) ? data : (data.data || data.services || []);
+                renderServices('sourcils');
+            } catch (err) {
+                $serviceList.innerHTML = '<div class="slots-empty">Impossible de charger les prestations. Veuillez reessayer.</div>';
+                console.error('loadServices error:', err);
+            }
+        }
+
+        function renderServices(category) {
+            var filtered = services.filter(function (s) { return categorize(s.name) === category; });
+
+            if (!filtered.length) {
+                $serviceList.innerHTML = '<div class="slots-empty">Aucune prestation dans cette categorie</div>';
+                return;
+            }
+
+            // Sort by price
+            filtered.sort(function (a, b) { return a.price - b.price; });
+
+            var html = '';
+            filtered.forEach(function (s) {
+                var pop = isPopular(s.name);
+                var sel = selectedService && selectedService.id === s.id;
+                html += '<div class="service-card' + (sel ? ' service-card--selected' : '') + (pop ? ' service-card--popular' : '') + '" data-id="' + s.id + '">';
+                if (pop) html += '<span class="service-card__badge">Populaire</span>';
+                html += '<div class="service-card__radio"></div>';
+                html += '<div class="service-card__info"><p class="service-card__name">' + escapeHtml(s.name) + '</p><span class="service-card__duration">' + s.duration + ' min</span></div>';
+                html += '<span class="service-card__price">' + formatPrice(s.price) + '</span>';
+                html += '</div>';
+            });
+
+            $serviceList.innerHTML = html;
+
+            // Click handlers
+            $serviceList.querySelectorAll('.service-card').forEach(function (card) {
+                card.addEventListener('click', function () {
+                    var id = this.getAttribute('data-id');
+                    selectedService = services.find(function (s) { return s.id === id; });
+                    $serviceList.querySelectorAll('.service-card').forEach(function (c) { c.classList.remove('service-card--selected'); });
+                    this.classList.add('service-card--selected');
+                    document.getElementById('btn-step1-next').disabled = false;
+                });
+            });
+
+            // GSAP animation
+            if (typeof gsap !== 'undefined') {
+                gsap.fromTo($serviceList.querySelectorAll('.service-card'),
+                    { opacity: 0, y: 12 },
+                    { opacity: 1, y: 0, duration: 0.35, stagger: 0.05, ease: 'power2.out' }
+                );
+            }
+        }
+
+        // Category tabs
+        $catTabs.addEventListener('click', function (e) {
+            var tab = e.target.closest('.cat-tab');
+            if (!tab) return;
+            $catTabs.querySelectorAll('.cat-tab').forEach(function (t) { t.classList.remove('cat-tab--active'); });
+            tab.classList.add('cat-tab--active');
+            renderServices(tab.getAttribute('data-category'));
+        });
+
+        // Step 1 next
+        document.getElementById('btn-step1-next').addEventListener('click', function () {
+            if (!selectedService) return;
+            selectedDate = null;
+            selectedTime = null;
+            $slotsContainer.style.display = 'none';
+            renderCalendar();
+            goToStep(2);
+        });
+
+        // --- Step 2: Calendar + Slots ---
+
+        function renderCalendar() {
+            var year = calendarMonth.getFullYear();
+            var month = calendarMonth.getMonth();
+            $calMonth.textContent = MONTHS[month] + ' ' + year;
+
+            var today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            var maxDate = new Date();
+            maxDate.setMonth(maxDate.getMonth() + 6);
+
+            // Disable prev if we're at current month
+            var isCurrentMonth = (year === today.getFullYear() && month === today.getMonth());
+            $calPrev.disabled = isCurrentMonth;
+
+            // Disable next if beyond 6 months
+            var nextMonth = new Date(year, month + 1, 1);
+            $calNext.disabled = nextMonth > maxDate;
+
+            // First day of month
+            var firstDay = new Date(year, month, 1).getDay();
+            // Adjust for Monday start (0=Mon)
+            var startOffset = (firstDay === 0) ? 6 : firstDay - 1;
+            var daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            // Closed days: Sunday (0) and Monday (1)
+            var html = '';
+
+            // Empty cells for offset
+            for (var i = 0; i < startOffset; i++) {
+                html += '<button class="calendar__date calendar__date--empty" disabled type="button"></button>';
+            }
+
+            for (var d = 1; d <= daysInMonth; d++) {
+                var date = new Date(year, month, d);
+                var dateStr = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+                var dayOfWeek = date.getDay(); // 0=Sun, 1=Mon
+                var isPast = date < today;
+                var isBeyond = date > maxDate;
+                var isClosed = (dayOfWeek === 0 || dayOfWeek === 1); // Sunday or Monday
+                var isToday = (date.getTime() === today.getTime());
+                var isSelected = (selectedDate === dateStr);
+                var disabled = isPast || isBeyond || isClosed;
+
+                var classes = 'calendar__date';
+                if (isToday) classes += ' calendar__date--today';
+                if (isSelected) classes += ' calendar__date--selected';
+
+                html += '<button class="' + classes + '" data-date="' + dateStr + '"' + (disabled ? ' disabled' : '') + ' type="button">' + d + '</button>';
+            }
+
+            $calGrid.innerHTML = html;
+
+            // Date click handlers
+            $calGrid.querySelectorAll('.calendar__date:not(:disabled)').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    selectedDate = this.getAttribute('data-date');
+                    selectedTime = null;
+                    document.getElementById('btn-step2-next').disabled = true;
+
+                    $calGrid.querySelectorAll('.calendar__date').forEach(function (b) { b.classList.remove('calendar__date--selected'); });
+                    this.classList.add('calendar__date--selected');
+
+                    loadSlots(selectedDate);
+                });
+            });
+        }
+
+        $calPrev.addEventListener('click', function () {
+            calendarMonth.setMonth(calendarMonth.getMonth() - 1);
+            renderCalendar();
+        });
+
+        $calNext.addEventListener('click', function () {
+            calendarMonth.setMonth(calendarMonth.getMonth() + 1);
+            renderCalendar();
+        });
+
+        async function loadSlots(dateStr) {
+            $slotsContainer.style.display = 'block';
+            $slotsLabel.textContent = 'Creneaux du ' + formatDateFr(dateStr);
+            $slotsContent.innerHTML = '<div class="slots-loading">Chargement des creneaux...</div>';
+
+            try {
+                var url = API_URL + '/availability?service_id=' + selectedService.id + '&date=' + dateStr;
+                var res = await fetch(url);
+                if (!res.ok) throw new Error('Erreur serveur');
+                var data = await res.json();
+                var slots = Array.isArray(data) ? data : (data.data || data.slots || data.availability || []);
+
+                if (!slots.length) {
+                    $slotsContent.innerHTML = '<div class="slots-empty">Aucun creneau disponible ce jour</div>';
+                    return;
+                }
+
+                var html = '<div class="slots-grid">';
+                slots.forEach(function (slot) {
+                    var time = typeof slot === 'string' ? slot : (slot.start_time || slot.time);
+                    var display = time.slice(0, 5);
+                    html += '<button class="slot-btn" data-time="' + time + '" type="button">' + display + '</button>';
+                });
+                html += '</div>';
+
+                $slotsContent.innerHTML = html;
+
+                // Slot click handlers
+                $slotsContent.querySelectorAll('.slot-btn').forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        selectedTime = this.getAttribute('data-time');
+                        $slotsContent.querySelectorAll('.slot-btn').forEach(function (b) { b.classList.remove('slot-btn--selected'); });
+                        this.classList.add('slot-btn--selected');
+                        document.getElementById('btn-step2-next').disabled = false;
+                    });
+                });
+
+                // GSAP
+                if (typeof gsap !== 'undefined') {
+                    gsap.fromTo($slotsContent.querySelectorAll('.slot-btn'),
+                        { opacity: 0, scale: 0.9 },
+                        { opacity: 1, scale: 1, duration: 0.25, stagger: 0.02, ease: 'power2.out' }
+                    );
+                }
+            } catch (err) {
+                $slotsContent.innerHTML = '<div class="slots-empty">Impossible de charger les creneaux</div>';
+                console.error('loadSlots error:', err);
+            }
+        }
+
+        // Step 2 buttons
+        document.getElementById('btn-step2-back').addEventListener('click', function () { goToStep(1); });
+        document.getElementById('btn-step2-next').addEventListener('click', function () {
+            if (!selectedDate || !selectedTime) return;
+
+            // Fill recap
+            document.getElementById('recap-service').textContent = selectedService.name;
+            document.getElementById('recap-date').textContent = formatDateFr(selectedDate);
+            document.getElementById('recap-time').textContent = selectedTime.slice(0, 5);
+            document.getElementById('recap-duration').textContent = selectedService.duration + ' min';
+            document.getElementById('recap-price').textContent = formatPrice(selectedService.price);
+
+            goToStep(3);
+        });
+
+        // --- Step 3: Form + Confirm ---
+
+        document.getElementById('btn-step3-back').addEventListener('click', function () { goToStep(2); });
+
+        document.getElementById('btn-step3-confirm').addEventListener('click', async function () {
+            var firstName = document.getElementById('input-firstname').value.trim();
+            var phone = document.getElementById('input-phone').value.trim();
+            var email = document.getElementById('input-email').value.trim();
+
+            // Validation
+            var valid = true;
+            if (!firstName) {
+                document.getElementById('err-firstname').classList.add('form-error--visible');
+                valid = false;
+            } else {
+                document.getElementById('err-firstname').classList.remove('form-error--visible');
+            }
+
+            var phoneClean = phone.replace(/[\s.\-]/g, '');
+            if (!phoneClean.match(/^(0[1-9])\d{8}$/) && !phoneClean.match(/^\+33\d{9}$/)) {
+                document.getElementById('err-phone').classList.add('form-error--visible');
+                valid = false;
+            } else {
+                document.getElementById('err-phone').classList.remove('form-error--visible');
+            }
+
+            if (email && !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                document.getElementById('err-email').classList.add('form-error--visible');
+                valid = false;
+            } else {
+                document.getElementById('err-email').classList.remove('form-error--visible');
+            }
+
+            if (!valid) return;
+
+            var btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Confirmation...';
+
+            try {
+                var body = {
+                    service_id: selectedService.id,
+                    date: selectedDate,
+                    start_time: selectedTime.slice(0, 5),
+                    first_name: firstName,
+                    phone: phoneClean,
+                };
+                if (email) body.email = email;
+
+                var res = await fetch(API_URL + '/bookings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body),
+                });
+
+                var data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.message || data.error || 'Erreur lors de la reservation');
+                }
+
+                // Success
+                var details = document.getElementById('success-details');
+                details.innerHTML = '<p class="success__detail"><strong>Prestation :</strong> ' + escapeHtml(selectedService.name) + '</p>' +
+                    '<p class="success__detail"><strong>Date :</strong> ' + formatDateFr(selectedDate) + '</p>' +
+                    '<p class="success__detail"><strong>Heure :</strong> ' + selectedTime.slice(0, 5) + '</p>' +
+                    '<p class="success__detail"><strong>Prix :</strong> ' + formatPrice(selectedService.price) + '</p>';
+
+                goToStep(4);
+
+            } catch (err) {
+                showToast(err.message || 'Une erreur est survenue');
+                btn.disabled = false;
+                btn.textContent = 'Confirmer le rendez-vous';
+            }
+        });
+
+        // Clear errors on input
+        ['input-firstname', 'input-phone', 'input-email'].forEach(function (id) {
+            document.getElementById(id).addEventListener('input', function () {
+                var errId = 'err-' + id.replace('input-', '');
+                document.getElementById(errId).classList.remove('form-error--visible');
+            });
+        });
+
+        // --- Escape HTML ---
+
+        /**
+         * @param {string} str
+         * @returns {string}
+         */
+        function escapeHtml(str) {
+            var div = document.createElement('div');
+            div.appendChild(document.createTextNode(str));
+            return div.innerHTML;
+        }
+
+        // --- Init ---
+        loadServices();
+
+    })();
+    </script>
+</body>
+</html>

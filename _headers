@@ -31,3 +31,12 @@
 
 /mentions-legales/*
   Cache-Control: public, max-age=86400
+
+/reserver/*
+  Cache-Control: no-cache
+
+/mon-rdv/*
+  Cache-Control: no-cache
+
+/reset-password/*
+  Cache-Control: no-cache

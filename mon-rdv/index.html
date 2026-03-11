@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Mon rendez-vous | Maison du Regard</title>
+    <meta name="description" content="Consultez, modifiez ou annulez votre rendez-vous a la Maison du Regard.">
+    <meta name="theme-color" content="#FFF5F0">
+    <meta name="robots" content="noindex">
+    <link rel="canonical" href="https://lamaisonduregard.fr/mon-rdv/">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+    <link rel="stylesheet" href="/styles.css">
+
+    <style>
+    .rdv { padding-bottom: 120px; max-width: 480px; margin: 0 auto; }
+
+    /* --- Booking card --- */
+    .rdv-card { background: #fff; border: 1.5px solid #F0E0D6; border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+    .rdv-card__status { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px; font-family: var(--font-body); font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }
+    .rdv-card__status--confirmed { background: rgba(74, 222, 128, 0.12); color: #16a34a; }
+    .rdv-card__status--completed { background: rgba(96, 165, 250, 0.12); color: #2563eb; }
+    .rdv-card__status--cancelled { background: rgba(248, 113, 113, 0.12); color: #dc2626; }
+    .rdv-card__status--no_show { background: rgba(251, 191, 36, 0.12); color: #d97706; }
+    .rdv-card__status-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .rdv-card__status--confirmed .rdv-card__status-dot { background: #16a34a; }
+    .rdv-card__status--completed .rdv-card__status-dot { background: #2563eb; }
+    .rdv-card__status--cancelled .rdv-card__status-dot { background: #dc2626; }
+    .rdv-card__status--no_show .rdv-card__status-dot { background: #d97706; }
+
+    .rdv-card__service { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; color: var(--color-text); margin-bottom: 16px; }
+
+    .rdv-card__row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #F8F0EC; }
+    .rdv-card__row:last-child { border-bottom: none; }
+    .rdv-card__icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(201, 169, 110, 0.08); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .rdv-card__icon svg { color: var(--color-gold); }
+    .rdv-card__label { font-family: var(--font-body); font-size: 0.75rem; color: var(--color-text-muted); }
+    .rdv-card__value { font-family: var(--font-body); font-size: 0.9rem; font-weight: 600; color: var(--color-text); }
+    .rdv-card__price { font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: var(--color-gold); }
+
+    /* --- Actions --- */
+    .rdv-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
+    .rdv-btn { width: 100%; padding: 14px; border: none; border-radius: 999px; font-family: var(--font-body); font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.35s; text-align: center; text-decoration: none; display: block; box-sizing: border-box; }
+    .rdv-btn--primary { background: linear-gradient(135deg, #ff9a9e 0%, #fcb69f 100%); color: #fff; box-shadow: 0 4px 20px rgba(255, 154, 158, 0.3); }
+    .rdv-btn--primary:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(255, 154, 158, 0.4); }
+    .rdv-btn--outline { background: transparent; border: 1.5px solid #F0E0D6; color: var(--color-text); }
+    .rdv-btn--outline:hover { border-color: var(--color-gold); color: var(--color-gold); }
+    .rdv-btn--danger { background: transparent; border: 1.5px solid #fca5a5; color: #dc2626; }
+    .rdv-btn--danger:hover { background: rgba(220, 38, 38, 0.05); }
+    .rdv-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* --- Calendar/slots (reused from reserver) --- */
+    .calendar { background: #fff; border-radius: 16px; border: 1px solid #F0E0D6; padding: 16px; margin-bottom: 20px; }
+    .calendar__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .calendar__month { font-family: var(--font-display); font-size: 1rem; font-weight: 600; color: var(--color-text); }
+    .calendar__nav { width: 36px; height: 36px; border-radius: 50%; border: 1px solid #F0E0D6; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.25s; color: var(--color-text); }
+    .calendar__nav:hover { border-color: var(--color-gold); color: var(--color-gold); }
+    .calendar__nav:disabled { opacity: 0.3; cursor: not-allowed; }
+    .calendar__days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; margin-bottom: 8px; }
+    .calendar__day-name { font-family: var(--font-body); font-size: 0.7rem; font-weight: 600; color: var(--color-text-muted); padding: 4px 0; text-transform: uppercase; letter-spacing: 0.5px; }
+    .calendar__grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .calendar__date { width: 100%; aspect-ratio: 1; border-radius: 50%; border: none; background: transparent; font-family: var(--font-body); font-size: 0.82rem; font-weight: 500; color: var(--color-text); cursor: pointer; transition: all 0.25s; display: flex; align-items: center; justify-content: center; }
+    .calendar__date:hover:not(:disabled):not(.calendar__date--selected) { background: rgba(201, 169, 110, 0.1); }
+    .calendar__date--selected { background: var(--color-gold); color: #fff; font-weight: 600; }
+    .calendar__date--today { font-weight: 700; position: relative; }
+    .calendar__date--today::after { content: ''; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: var(--color-gold); }
+    .calendar__date--today.calendar__date--selected::after { background: #fff; }
+    .calendar__date:disabled { color: #ccc; cursor: not-allowed; }
+    .calendar__date--empty { cursor: default; }
+
+    .slots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px; }
+    .slot-btn { padding: 10px 8px; border-radius: 12px; border: 1.5px solid #F0E0D6; background: #fff; font-family: var(--font-body); font-size: 0.85rem; font-weight: 500; color: var(--color-text); cursor: pointer; transition: all 0.25s; text-align: center; }
+    .slot-btn:hover { border-color: var(--color-gold-light); }
+    .slot-btn--selected { background: var(--color-gold); color: #fff; border-color: var(--color-gold); font-weight: 600; }
+
+    /* --- States --- */
+    .rdv-loading { text-align: center; padding: 48px 16px; color: var(--color-text-muted); font-family: var(--font-body); }
+    .rdv-error { text-align: center; padding: 48px 16px; }
+    .rdv-error__title { font-family: var(--font-display); font-size: 1.2rem; color: var(--color-text); margin-bottom: 8px; }
+    .rdv-error__text { font-family: var(--font-body); font-size: 0.88rem; color: var(--color-text-muted); margin-bottom: 24px; line-height: 1.6; }
+
+    .cancelled-msg { text-align: center; padding: 24px 16px; background: rgba(248, 113, 113, 0.06); border-radius: 16px; margin-bottom: 20px; }
+    .cancelled-msg__title { font-family: var(--font-display); font-size: 1.1rem; color: var(--color-text); margin-bottom: 8px; }
+    .cancelled-msg__text { font-family: var(--font-body); font-size: 0.85rem; color: var(--color-text-muted); }
+
+    /* --- Confirm dialog --- */
+    .confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
+    .confirm-overlay--visible { display: flex; }
+    .confirm-dialog { background: #fff; border-radius: 20px; padding: 28px 24px; max-width: 360px; width: 100%; text-align: center; }
+    .confirm-dialog__title { font-family: var(--font-display); font-size: 1.1rem; color: var(--color-text); margin-bottom: 10px; }
+    .confirm-dialog__text { font-family: var(--font-body); font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 20px; line-height: 1.6; }
+    .confirm-dialog__actions { display: flex; gap: 10px; }
+    .confirm-dialog__actions .rdv-btn { flex: 1; padding: 12px; font-size: 0.85rem; }
+
+    .slots-label { font-family: var(--font-body); font-size: 0.85rem; font-weight: 600; color: var(--color-text); margin-bottom: 12px; }
+    .slots-empty { text-align: center; padding: 24px; color: var(--color-text-muted); font-family: var(--font-body); font-size: 0.85rem; }
+
+    .spinner { display: inline-block; width: 20px; height: 20px; border: 2.5px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 8px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #e74c3c; color: #fff; padding: 12px 20px; border-radius: 12px; font-family: var(--font-body); font-size: 0.85rem; font-weight: 500; z-index: 9999; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); max-width: 90%; text-align: center; }
+    .toast--visible { transform: translateX(-50%) translateY(0); }
+    .toast--success { background: #16a34a; }
+    </style>
+</head>
+<body data-page="mon-rdv">
+    <div class="app">
+        <div class="page page--sub">
+            <header class="page__header">
+                <a class="page__back" href="/" aria-label="Retour a l'accueil">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </a>
+                <h2 class="page__title">Mon rendez-vous</h2>
+                <div class="page__header-spacer"></div>
+            </header>
+
+            <div class="page__body rdv">
+                <div id="rdv-content">
+                    <div class="rdv-loading">Chargement de votre rendez-vous...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm dialog -->
+    <div class="confirm-overlay" id="confirm-overlay">
+        <div class="confirm-dialog">
+            <p class="confirm-dialog__title" id="confirm-title"></p>
+            <p class="confirm-dialog__text" id="confirm-text"></p>
+            <div class="confirm-dialog__actions">
+                <button class="rdv-btn rdv-btn--outline" id="confirm-cancel" type="button">Non</button>
+                <button class="rdv-btn rdv-btn--danger" id="confirm-ok" type="button">Oui, annuler</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Cookie Banner -->
+    <div class="cookie-banner" id="cookie-banner">
+        <p>Ce site utilise des cookies techniques pour son bon fonctionnement.</p>
+        <div class="cookie-banner__actions">
+            <button class="cookie-banner__btn cookie-banner__btn--accept" id="cookie-accept" type="button">Accepter</button>
+            <button class="cookie-banner__btn" id="cookie-legal" type="button">En savoir plus</button>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav" aria-label="Navigation rapide">
+        <a class="bottom-nav__item" href="/" data-nav="home">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Accueil</span>
+        </a>
+        <a class="bottom-nav__item" href="/soins/" data-nav="soins">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+            <span>Soins</span>
+        </a>
+        <a class="bottom-nav__item bottom-nav__item--cta" href="/reserver/" aria-label="Prendre rendez-vous">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+            <span>RDV</span>
+        </a>
+        <a class="bottom-nav__item" href="/salon/" data-nav="salon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V13h6v8"/></svg>
+            <span>Salon</span>
+        </a>
+        <a class="bottom-nav__item" href="/galerie/" data-nav="galerie">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            <span>Galerie</span>
+        </a>
+    </nav>
+
+    <script src="/script.js"></script>
+    <script>
+    (function () {
+        'use strict';
+
+        var API_URL = window.location.hostname === 'localhost'
+            ? 'http://localhost:3000/api'
+            : 'https://api.lamaisonduregard.fr/api';
+
+        var MONTHS = ['Janvier', 'Fevrier', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Aout', 'Septembre', 'Octobre', 'Novembre', 'Decembre'];
+        var STATUS_LABELS = { confirmed: 'Confirme', completed: 'Termine', cancelled: 'Annule', no_show: 'Absent' };
+
+        var $content = document.getElementById('rdv-content');
+        var $toast = document.getElementById('toast');
+        var $overlay = document.getElementById('confirm-overlay');
+
+        // Parse URL params
+        var params = new URLSearchParams(window.location.search);
+        var bookingId = params.get('id');
+        var token = params.get('token');
+
+        var booking = null;
+        var rescheduleDate = null;
+        var rescheduleTime = null;
+        var calendarMonth = new Date();
+        calendarMonth.setDate(1);
+
+        function showToast(msg, type) {
+            $toast.className = 'toast' + (type === 'success' ? ' toast--success' : '');
+            $toast.textContent = msg;
+            $toast.classList.add('toast--visible');
+            setTimeout(function () { $toast.classList.remove('toast--visible'); }, 4000);
+        }
+
+        function formatPrice(price) {
+            if (price % 100 === 0) return (price / 100) + '\u20ac';
+            return (price / 100).toFixed(2).replace('.', ',') + '\u20ac';
+        }
+
+        function formatDateFr(dateStr) {
+            var parts = dateStr.split('-');
+            var days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+            var d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            return days[d.getDay()] + ' ' + parseInt(parts[2]) + ' ' + MONTHS[parseInt(parts[1]) - 1];
+        }
+
+        function escapeHtml(str) {
+            var div = document.createElement('div');
+            div.appendChild(document.createTextNode(str || ''));
+            return div.innerHTML;
+        }
+
+        function canModify() {
+            if (!booking || booking.status !== 'confirmed') return false;
+            var parts = booking.date.split('-');
+            var rdvDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            var timeParts = (booking.start_time || '09:00').split(':');
+            rdvDate.setHours(parseInt(timeParts[0]), parseInt(timeParts[1]));
+            var hoursUntil = (rdvDate - new Date()) / 3600000;
+            return hoursUntil >= 24;
+        }
+
+        // --- Load booking ---
+        async function loadBooking() {
+            if (!bookingId || !token) {
+                $content.innerHTML = '<div class="rdv-error"><p class="rdv-error__title">Lien invalide</p><p class="rdv-error__text">Le lien pour acceder a votre rendez-vous est incomplet ou invalide.</p><a class="rdv-btn rdv-btn--primary" href="/">Retour a l\'accueil</a></div>';
+                return;
+            }
+
+            try {
+                var res = await fetch(API_URL + '/bookings/' + bookingId + '?token=' + token);
+                if (!res.ok) throw new Error('Rendez-vous introuvable');
+                var data = await res.json();
+                booking = data.data || data.booking || data;
+                renderBooking();
+            } catch (err) {
+                $content.innerHTML = '<div class="rdv-error"><p class="rdv-error__title">Rendez-vous introuvable</p><p class="rdv-error__text">Ce rendez-vous n\'existe pas ou le lien a expire.</p><a class="rdv-btn rdv-btn--primary" href="/">Retour a l\'accueil</a></div>';
+            }
+        }
+
+        function renderBooking() {
+            var b = booking;
+            var serviceName = b.service_name || (b.service && b.service.name) || 'Prestation';
+            var duration = b.duration || (b.service && b.service.duration) || '';
+            var price = b.price || (b.service && b.service.price) || 0;
+            var status = b.status || 'confirmed';
+            var isCancelled = status === 'cancelled';
+            var showActions = canModify();
+
+            var html = '';
+
+            if (isCancelled) {
+                html += '<div class="cancelled-msg"><p class="cancelled-msg__title">Ce rendez-vous a ete annule</p><p class="cancelled-msg__text">Vous pouvez reprendre rendez-vous a tout moment.</p></div>';
+            }
+
+            html += '<div class="rdv-card">';
+            html += '<div class="rdv-card__status rdv-card__status--' + status + '"><span class="rdv-card__status-dot"></span>' + (STATUS_LABELS[status] || status) + '</div>';
+            html += '<p class="rdv-card__service">' + escapeHtml(serviceName) + '</p>';
+
+            html += '<div class="rdv-card__row"><div class="rdv-card__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg></div><div><p class="rdv-card__label">Date</p><p class="rdv-card__value">' + formatDateFr(b.date) + '</p></div></div>';
+
+            html += '<div class="rdv-card__row"><div class="rdv-card__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><p class="rdv-card__label">Heure</p><p class="rdv-card__value">' + (b.start_time || '').slice(0, 5) + '</p></div></div>';
+
+            if (duration) {
+                html += '<div class="rdv-card__row"><div class="rdv-card__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></svg></div><div><p class="rdv-card__label">Duree</p><p class="rdv-card__value">' + duration + ' min</p></div></div>';
+            }
+
+            if (price) {
+                html += '<div class="rdv-card__row"><div class="rdv-card__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div><p class="rdv-card__label">Prix</p><p class="rdv-card__price">' + formatPrice(price) + '</p></div></div>';
+            }
+
+            html += '</div>';
+
+            // Actions
+            html += '<div class="rdv-actions">';
+
+            // Download ICS
+            if (status === 'confirmed') {
+                html += '<a class="rdv-btn rdv-btn--primary" href="' + API_URL + '/bookings/' + bookingId + '/ics?token=' + token + '" download>Ajouter au calendrier</a>';
+            }
+
+            if (showActions && !b.rescheduled) {
+                html += '<button class="rdv-btn rdv-btn--outline" id="btn-reschedule" type="button">Modifier le creneau</button>';
+            }
+
+            if (showActions) {
+                html += '<button class="rdv-btn rdv-btn--danger" id="btn-cancel" type="button">Annuler le rendez-vous</button>';
+            }
+
+            if (isCancelled) {
+                html += '<a class="rdv-btn rdv-btn--primary" href="/reserver/">Reprendre rendez-vous</a>';
+            }
+
+            html += '</div>';
+
+            // Reschedule section
+            html += '<div id="reschedule-section" style="display:none;"></div>';
+
+            $content.innerHTML = html;
+
+            // Bind actions
+            var cancelBtn = document.getElementById('btn-cancel');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', function () {
+                    document.getElementById('confirm-title').textContent = 'Annuler le rendez-vous ?';
+                    document.getElementById('confirm-text').textContent = 'Cette action est irreversible. Vous pourrez reprendre rendez-vous par la suite.';
+                    document.getElementById('confirm-ok').textContent = 'Oui, annuler';
+                    document.getElementById('confirm-ok').className = 'rdv-btn rdv-btn--danger';
+                    $overlay.classList.add('confirm-overlay--visible');
+
+                    document.getElementById('confirm-cancel').onclick = function () { $overlay.classList.remove('confirm-overlay--visible'); };
+                    document.getElementById('confirm-ok').onclick = cancelBooking;
+                });
+            }
+
+            var rescheduleBtn = document.getElementById('btn-reschedule');
+            if (rescheduleBtn) {
+                rescheduleBtn.addEventListener('click', showReschedule);
+            }
+        }
+
+        async function cancelBooking() {
+            $overlay.classList.remove('confirm-overlay--visible');
+            try {
+                var res = await fetch(API_URL + '/bookings/' + bookingId + '/cancel', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: token }),
+                });
+                if (!res.ok) {
+                    var data = await res.json();
+                    throw new Error(data.message || 'Erreur');
+                }
+                showToast('Rendez-vous annule', 'success');
+                booking.status = 'cancelled';
+                renderBooking();
+            } catch (err) {
+                showToast(err.message || 'Erreur lors de l\'annulation');
+            }
+        }
+
+        // --- Reschedule ---
+        function showReschedule() {
+            rescheduleDate = null;
+            rescheduleTime = null;
+            var section = document.getElementById('reschedule-section');
+            section.style.display = 'block';
+
+            section.innerHTML = '<div style="margin-top:24px;"><p class="slots-label" style="font-size:1rem; font-weight:700; margin-bottom:16px;">Choisir un nouveau creneau</p>' +
+                '<div class="calendar" id="rs-calendar"><div class="calendar__header"><button class="calendar__nav" id="rs-cal-prev" type="button" aria-label="Mois precedent"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button><span class="calendar__month" id="rs-cal-month"></span><button class="calendar__nav" id="rs-cal-next" type="button" aria-label="Mois suivant"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button></div><div class="calendar__days"><span class="calendar__day-name">Lun</span><span class="calendar__day-name">Mar</span><span class="calendar__day-name">Mer</span><span class="calendar__day-name">Jeu</span><span class="calendar__day-name">Ven</span><span class="calendar__day-name">Sam</span><span class="calendar__day-name">Dim</span></div><div class="calendar__grid" id="rs-cal-grid"></div></div>' +
+                '<div id="rs-slots-container" style="display:none;"><p class="slots-label" id="rs-slots-label"></p><div id="rs-slots-content"></div></div>' +
+                '<div style="display:flex;gap:10px;margin-top:16px;"><button class="rdv-btn rdv-btn--outline" id="rs-cancel" type="button" style="flex:0.5;">Annuler</button><button class="rdv-btn rdv-btn--primary" id="rs-confirm" type="button" disabled style="flex:1;">Confirmer</button></div></div>';
+
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            renderRescheduleCalendar();
+
+            document.getElementById('rs-cal-prev').addEventListener('click', function () {
+                calendarMonth.setMonth(calendarMonth.getMonth() - 1);
+                renderRescheduleCalendar();
+            });
+            document.getElementById('rs-cal-next').addEventListener('click', function () {
+                calendarMonth.setMonth(calendarMonth.getMonth() + 1);
+                renderRescheduleCalendar();
+            });
+            document.getElementById('rs-cancel').addEventListener('click', function () {
+                section.style.display = 'none';
+                section.innerHTML = '';
+            });
+            document.getElementById('rs-confirm').addEventListener('click', confirmReschedule);
+        }
+
+        function renderRescheduleCalendar() {
+            var year = calendarMonth.getFullYear();
+            var month = calendarMonth.getMonth();
+            document.getElementById('rs-cal-month').textContent = MONTHS[month] + ' ' + year;
+
+            var today = new Date(); today.setHours(0, 0, 0, 0);
+            var maxDate = new Date(); maxDate.setMonth(maxDate.getMonth() + 6);
+            var isCurrentMonth = (year === today.getFullYear() && month === today.getMonth());
+            document.getElementById('rs-cal-prev').disabled = isCurrentMonth;
+            document.getElementById('rs-cal-next').disabled = new Date(year, month + 1, 1) > maxDate;
+
+            var firstDay = new Date(year, month, 1).getDay();
+            var startOffset = (firstDay === 0) ? 6 : firstDay - 1;
+            var daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            var html = '';
+            for (var i = 0; i < startOffset; i++) {
+                html += '<button class="calendar__date calendar__date--empty" disabled type="button"></button>';
+            }
+            for (var d = 1; d <= daysInMonth; d++) {
+                var date = new Date(year, month, d);
+                var dateStr = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+                var dayOfWeek = date.getDay();
+                var disabled = date < today || date > maxDate || dayOfWeek === 0 || dayOfWeek === 1;
+                var isToday = date.getTime() === today.getTime();
+                var isSelected = rescheduleDate === dateStr;
+                var classes = 'calendar__date' + (isToday ? ' calendar__date--today' : '') + (isSelected ? ' calendar__date--selected' : '');
+                html += '<button class="' + classes + '" data-date="' + dateStr + '"' + (disabled ? ' disabled' : '') + ' type="button">' + d + '</button>';
+            }
+
+            document.getElementById('rs-cal-grid').innerHTML = html;
+
+            document.getElementById('rs-cal-grid').querySelectorAll('.calendar__date:not(:disabled)').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    rescheduleDate = this.getAttribute('data-date');
+                    rescheduleTime = null;
+                    document.getElementById('rs-confirm').disabled = true;
+                    document.querySelectorAll('#rs-cal-grid .calendar__date').forEach(function (b) { b.classList.remove('calendar__date--selected'); });
+                    this.classList.add('calendar__date--selected');
+                    loadRescheduleSlots(rescheduleDate);
+                });
+            });
+        }
+
+        async function loadRescheduleSlots(dateStr) {
+            var container = document.getElementById('rs-slots-container');
+            container.style.display = 'block';
+            document.getElementById('rs-slots-label').textContent = 'Creneaux du ' + formatDateFr(dateStr);
+            document.getElementById('rs-slots-content').innerHTML = '<div class="slots-empty">Chargement...</div>';
+
+            try {
+                var serviceId = booking.service_id || (booking.service && booking.service.id);
+                var res = await fetch(API_URL + '/availability?service_id=' + serviceId + '&date=' + dateStr);
+                if (!res.ok) throw new Error('Erreur');
+                var data = await res.json();
+                var slots = Array.isArray(data) ? data : (data.data || data.slots || data.availability || []);
+
+                if (!slots.length) {
+                    document.getElementById('rs-slots-content').innerHTML = '<div class="slots-empty">Aucun creneau disponible</div>';
+                    return;
+                }
+
+                var html = '<div class="slots-grid">';
+                slots.forEach(function (slot) {
+                    var time = typeof slot === 'string' ? slot : (slot.start_time || slot.time);
+                    html += '<button class="slot-btn" data-time="' + time + '" type="button">' + time.slice(0, 5) + '</button>';
+                });
+                html += '</div>';
+                document.getElementById('rs-slots-content').innerHTML = html;
+
+                document.getElementById('rs-slots-content').querySelectorAll('.slot-btn').forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        rescheduleTime = this.getAttribute('data-time');
+                        document.querySelectorAll('#rs-slots-content .slot-btn').forEach(function (b) { b.classList.remove('slot-btn--selected'); });
+                        this.classList.add('slot-btn--selected');
+                        document.getElementById('rs-confirm').disabled = false;
+                    });
+                });
+            } catch (err) {
+                document.getElementById('rs-slots-content').innerHTML = '<div class="slots-empty">Erreur lors du chargement</div>';
+            }
+        }
+
+        async function confirmReschedule() {
+            if (!rescheduleDate || !rescheduleTime) return;
+            var btn = document.getElementById('rs-confirm');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Modification...';
+
+            try {
+                var res = await fetch(API_URL + '/bookings/' + bookingId + '/reschedule', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: token, date: rescheduleDate, start_time: rescheduleTime.slice(0, 5) }),
+                });
+                var data = await res.json();
+                if (!res.ok) throw new Error(data.message || 'Erreur');
+
+                showToast('Rendez-vous modifie avec succes', 'success');
+                booking.date = rescheduleDate;
+                booking.start_time = rescheduleTime;
+                booking.rescheduled = true;
+                renderBooking();
+            } catch (err) {
+                showToast(err.message || 'Erreur lors de la modification');
+                btn.disabled = false;
+                btn.textContent = 'Confirmer';
+            }
+        }
+
+        // --- Init ---
+        loadBooking();
+
+    })();
+    </script>
+</body>
+</html>

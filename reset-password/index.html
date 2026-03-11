@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Nouveau mot de passe | Maison du Regard</title>
+    <meta name="description" content="Definissez votre nouveau mot de passe pour votre compte Maison du Regard.">
+    <meta name="theme-color" content="#FFF5F0">
+    <meta name="robots" content="noindex">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+    <link rel="stylesheet" href="/styles.css">
+
+    <style>
+    .reset { padding-bottom: 120px; max-width: 420px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; min-height: 60vh; justify-content: center; }
+
+    .reset-card { background: #fff; border: 1.5px solid #F0E0D6; border-radius: 20px; padding: 32px 24px; width: 100%; box-sizing: border-box; }
+    .reset-card__icon { width: 56px; height: 56px; border-radius: 50%; background: rgba(201, 169, 110, 0.1); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+    .reset-card__title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--color-text); text-align: center; margin-bottom: 8px; }
+    .reset-card__subtitle { font-family: var(--font-body); font-size: 0.85rem; color: var(--color-text-muted); text-align: center; margin-bottom: 28px; line-height: 1.5; }
+
+    .form-group { margin-bottom: 16px; width: 100%; }
+    .form-label { display: block; font-family: var(--font-body); font-size: 0.8rem; font-weight: 600; color: var(--color-text); margin-bottom: 6px; }
+    .form-input { width: 100%; padding: 12px 16px; border: 1.5px solid #F0E0D6; border-radius: 12px; font-family: var(--font-body); font-size: 16px; color: var(--color-text); background: #fff; transition: border-color 0.25s; -webkit-appearance: none; box-sizing: border-box; }
+    .form-input:focus { outline: none; border-color: var(--color-gold); box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.12); }
+    .form-input::placeholder { color: #bbb; }
+    .form-error { font-family: var(--font-body); font-size: 0.75rem; color: #e74c3c; margin-top: 4px; display: none; }
+    .form-error--visible { display: block; }
+
+    .reset-btn { width: 100%; padding: 14px; border: none; border-radius: 999px; background: linear-gradient(135deg, #ff9a9e 0%, #fcb69f 100%); color: #fff; font-family: var(--font-body); font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.35s; margin-top: 8px; box-shadow: 0 4px 20px rgba(255, 154, 158, 0.3); }
+    .reset-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(255, 154, 158, 0.4); }
+    .reset-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .reset-success { text-align: center; padding: 32px 0; animation: fadeUp 0.5s; }
+    .reset-success__icon { width: 64px; height: 64px; border-radius: 50%; background: rgba(74, 222, 128, 0.12); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+    .reset-success__title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--color-text); margin-bottom: 8px; }
+    .reset-success__text { font-family: var(--font-body); font-size: 0.88rem; color: var(--color-text-muted); line-height: 1.5; }
+    .reset-success__redirect { font-family: var(--font-body); font-size: 0.8rem; color: var(--color-text-muted); margin-top: 20px; }
+
+    .spinner { display: inline-block; width: 20px; height: 20px; border: 2.5px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 8px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+    .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #e74c3c; color: #fff; padding: 12px 20px; border-radius: 12px; font-family: var(--font-body); font-size: 0.85rem; font-weight: 500; z-index: 9999; transition: transform 0.4s; max-width: 90%; text-align: center; }
+    .toast--visible { transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body data-page="reset-password">
+    <div class="app">
+        <div class="page page--sub">
+            <header class="page__header">
+                <a class="page__back" href="/" aria-label="Retour a l'accueil">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </a>
+                <h2 class="page__title">Mot de passe</h2>
+                <div class="page__header-spacer"></div>
+            </header>
+
+            <div class="page__body reset" id="reset-content">
+                <div class="reset-card" id="reset-form">
+                    <div class="reset-card__icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    </div>
+                    <h1 class="reset-card__title">Nouveau mot de passe</h1>
+                    <p class="reset-card__subtitle">Choisissez un nouveau mot de passe pour votre compte.</p>
+
+                    <div class="form-group">
+                        <label class="form-label" for="input-password">Nouveau mot de passe</label>
+                        <input class="form-input" type="password" id="input-password" placeholder="Minimum 8 caracteres" autocomplete="new-password" required>
+                        <p class="form-error" id="err-password">Le mot de passe doit contenir au moins 8 caracteres</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="input-confirm">Confirmer le mot de passe</label>
+                        <input class="form-input" type="password" id="input-confirm" placeholder="Retapez votre mot de passe" autocomplete="new-password" required>
+                        <p class="form-error" id="err-confirm">Les mots de passe ne correspondent pas</p>
+                    </div>
+
+                    <button class="reset-btn" id="btn-submit" type="button">Modifier le mot de passe</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Cookie Banner -->
+    <div class="cookie-banner" id="cookie-banner">
+        <p>Ce site utilise des cookies techniques pour son bon fonctionnement.</p>
+        <div class="cookie-banner__actions">
+            <button class="cookie-banner__btn cookie-banner__btn--accept" id="cookie-accept" type="button">Accepter</button>
+            <button class="cookie-banner__btn" id="cookie-legal" type="button">En savoir plus</button>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav" aria-label="Navigation rapide">
+        <a class="bottom-nav__item" href="/" data-nav="home">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Accueil</span>
+        </a>
+        <a class="bottom-nav__item" href="/soins/" data-nav="soins">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+            <span>Soins</span>
+        </a>
+        <a class="bottom-nav__item bottom-nav__item--cta" href="/reserver/" aria-label="Prendre rendez-vous">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+            <span>RDV</span>
+        </a>
+        <a class="bottom-nav__item" href="/salon/" data-nav="salon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V13h6v8"/></svg>
+            <span>Salon</span>
+        </a>
+        <a class="bottom-nav__item" href="/galerie/" data-nav="galerie">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            <span>Galerie</span>
+        </a>
+    </nav>
+
+    <script src="/script.js"></script>
+    <script>
+    (function () {
+        'use strict';
+
+        var API_URL = window.location.hostname === 'localhost'
+            ? 'http://localhost:3000/api'
+            : 'https://api.lamaisonduregard.fr/api';
+
+        var params = new URLSearchParams(window.location.search);
+        var resetToken = params.get('token');
+        var $toast = document.getElementById('toast');
+        var $content = document.getElementById('reset-content');
+
+        function showToast(msg) {
+            $toast.textContent = msg;
+            $toast.classList.add('toast--visible');
+            setTimeout(function () { $toast.classList.remove('toast--visible'); }, 4000);
+        }
+
+        if (!resetToken) {
+            $content.innerHTML = '<div class="reset-card" style="text-align:center;"><p class="reset-card__title">Lien invalide</p><p class="reset-card__subtitle">Le lien de reinitialisation est invalide ou a expire.</p><a class="reset-btn" href="/" style="display:block;text-decoration:none;text-align:center;">Retour a l\'accueil</a></div>';
+            return;
+        }
+
+        document.getElementById('btn-submit').addEventListener('click', async function () {
+            var password = document.getElementById('input-password').value;
+            var confirm = document.getElementById('input-confirm').value;
+
+            var valid = true;
+
+            if (password.length < 8) {
+                document.getElementById('err-password').classList.add('form-error--visible');
+                valid = false;
+            } else {
+                document.getElementById('err-password').classList.remove('form-error--visible');
+            }
+
+            if (password !== confirm) {
+                document.getElementById('err-confirm').classList.add('form-error--visible');
+                valid = false;
+            } else {
+                document.getElementById('err-confirm').classList.remove('form-error--visible');
+            }
+
+            if (!valid) return;
+
+            var btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Modification...';
+
+            try {
+                var res = await fetch(API_URL + '/auth/reset-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: resetToken, password: password }),
+                });
+
+                var data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.message || 'Erreur lors de la modification');
+                }
+
+                // Show success
+                $content.innerHTML = '<div class="reset-success"><div class="reset-success__icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><h2 class="reset-success__title">Mot de passe modifie</h2><p class="reset-success__text">Votre mot de passe a ete mis a jour avec succes.</p><p class="reset-success__redirect">Redirection vers l\'accueil...</p></div>';
+
+                setTimeout(function () { window.location.href = '/'; }, 3000);
+
+            } catch (err) {
+                showToast(err.message || 'Une erreur est survenue');
+                btn.disabled = false;
+                btn.textContent = 'Modifier le mot de passe';
+            }
+        });
+
+        // Clear errors on input
+        document.getElementById('input-password').addEventListener('input', function () {
+            document.getElementById('err-password').classList.remove('form-error--visible');
+        });
+        document.getElementById('input-confirm').addEventListener('input', function () {
+            document.getElementById('err-confirm').classList.remove('form-error--visible');
+        });
+
+    })();
+    </script>
+</body>
+</html>
