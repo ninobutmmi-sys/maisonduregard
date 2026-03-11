@@ -20,8 +20,9 @@ export function AuthProvider({ children }) {
       type: 'practitioner',
     });
     const userData = data.user || data.practitioner || data;
-    if (data.accessToken) {
-      localStorage.setItem('mdr_access_token', data.accessToken);
+    const token = data.accessToken || data.access_token;
+    if (token) {
+      localStorage.setItem('mdr_access_token', token);
     }
     localStorage.setItem('mdr_user', JSON.stringify(userData));
     setUser(userData);

@@ -28,8 +28,9 @@ async function refreshToken() {
   });
   if (!res.ok) throw new Error('Refresh failed');
   const data = await res.json();
-  if (data.accessToken) {
-    localStorage.setItem('mdr_access_token', data.accessToken);
+  const token = data.accessToken || data.access_token;
+  if (token) {
+    localStorage.setItem('mdr_access_token', token);
   }
   return data;
 }
