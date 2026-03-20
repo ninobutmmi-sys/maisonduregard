@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { format, addDays, subDays, startOfWeek, isToday, isSameDay, parseISO } from 'date-fns';
+import { format, addDays, subDays, addMonths, subMonths, startOfWeek, startOfMonth, endOfMonth, isToday, isSameDay, isSameMonth, isSameWeek, parseISO, getDay } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import api from '../api';
 
@@ -35,7 +35,7 @@ function formatPrice(cents) {
   return (cents / 100).toFixed(2).replace('.', ',') + ' \u20AC';
 }
 
-/* ── Close icon SVG ───────────────────────────── */
+/* ── SVG Icons ────────────────────────────────── */
 const CloseIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
@@ -55,8 +55,39 @@ const ChevronRight = () => (
 );
 
 const PlusIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+  </svg>
+);
+
+const CalendarIcon = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+    <line x1="16" y1="2" x2="16" y2="6" />
+    <line x1="8" y1="2" x2="8" y2="6" />
+    <line x1="3" y1="10" x2="21" y2="10" />
+  </svg>
+);
+
+const MoneyIcon = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="12" y1="1" x2="12" y2="23" />
+    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+  </svg>
+);
+
+const BlockIcon = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="3" width="18" height="18" rx="2" />
+    <line x1="9" y1="9" x2="15" y2="15" />
+    <line x1="15" y1="9" x2="9" y2="15" />
+  </svg>
+);
+
+const RefreshIcon = ({ spinning }) => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={spinning ? { animation: 'spin 0.8s linear infinite' } : undefined}>
+    <polyline points="23 4 23 10 17 10" />
+    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
   </svg>
 );
 
@@ -73,7 +104,12 @@ export default function Planning() {
   const [error, setError] = useState('');
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showBlockModal, setShowBlockModal] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [calendarMonth, setCalendarMonth] = useState(new Date());
+  const [refreshing, setRefreshing] = useState(false);
   const refreshTimer = useRef(null);
+  const calendarRef = useRef(null);
 
   /* ── Fetch data ─────────────────────────────── */
   const fetchData = useCallback(async () => {
@@ -122,10 +158,44 @@ export default function Planning() {
     return () => clearInterval(refreshTimer.current);
   }, [fetchData]);
 
+  // Close calendar on outside click
+  useEffect(() => {
+    if (!showCalendar) return;
+    const handler = (e) => {
+      if (calendarRef.current && !calendarRef.current.contains(e.target)) {
+        setShowCalendar(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showCalendar]);
+
+  // Sync calendar month when date changes
+  useEffect(() => { setCalendarMonth(date); }, [date]);
+
+  /* ── KPI Stats ──────────────────────────────── */
+  const stats = useMemo(() => {
+    const active = bookings.filter(b => b.status !== 'cancelled');
+    return {
+      count: active.length,
+      revenue: active.reduce((s, b) => s + (b.price || 0), 0),
+    };
+  }, [bookings]);
+
   /* ── Navigation ─────────────────────────────── */
   const goToday = () => setDate(new Date());
   const goPrev = () => setDate(d => view === 'week' ? addDays(d, -7) : subDays(d, 1));
   const goNext = () => setDate(d => view === 'week' ? addDays(d, 7) : addDays(d, 1));
+  const goPrevMonth = () => setDate(d => subMonths(d, 1));
+  const goNextMonth = () => setDate(d => addMonths(d, 1));
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchData();
+    setRefreshing(false);
+  }, [fetchData]);
+
+  const monthDisplay = useMemo(() => format(date, 'MMMM yyyy', { locale: fr }), [date]);
 
   const dateLabel = useMemo(() => {
     if (view === 'week') {
@@ -453,37 +523,82 @@ export default function Planning() {
   /* ═══ Render ════════════════════════════════════ */
   return (
     <div>
-      <div className="planning-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-          <h1 className="page-title">Planning</h1>
-          <div className="planning-view-toggle">
-            <button
-              className={`planning-view-btn ${view === 'day' ? 'planning-view-btn--active' : ''}`}
-              onClick={() => setView('day')}
-            >
-              Jour
-            </button>
-            <button
-              className={`planning-view-btn ${view === 'week' ? 'planning-view-btn--active' : ''}`}
-              onClick={() => setView('week')}
-            >
-              Semaine
-            </button>
+      {/* ── Premium Planning Header ────────────────── */}
+      <div className="plan-header">
+        <div className="plan-left">
+          <div className="plan-title-block">
+            <h2 className="plan-title">Planning</h2>
+            <div className="plan-kpis">
+              <span className="plan-kpi-chip">
+                <CalendarIcon />
+                RDV <span className="plan-kpi-val">{stats.count}</span>
+              </span>
+              <span className="plan-kpi-chip">
+                <MoneyIcon />
+                CA <span className="plan-kpi-val">{formatPrice(stats.revenue)}</span>
+              </span>
+            </div>
           </div>
+
+          <div className="plan-divider" />
+
+          <div className="plan-month-nav">
+            <button className="plan-nav-btn" onClick={goPrevMonth}><ChevronLeft /></button>
+            <span className="plan-month-label">{monthDisplay}</span>
+            <button className="plan-nav-btn" onClick={goNextMonth}><ChevronRight /></button>
+          </div>
+
+          <div className="plan-divider" />
+
+          <div className="planning-view-toggle">
+            {['week', 'day'].map(v => (
+              <button
+                key={v}
+                className={`planning-view-btn ${view === v ? 'planning-view-btn--active' : ''}`}
+                onClick={() => setView(v)}
+              >
+                {v === 'week' ? 'Semaine' : 'Jour'}
+              </button>
+            ))}
+          </div>
+
+          <div className="plan-nav" style={{ position: 'relative' }} ref={calendarRef}>
+            <button className="plan-nav-btn" onClick={goPrev}><ChevronLeft /></button>
+            <button
+              className="plan-nav-label plan-nav-label--clickable"
+              onClick={() => setShowCalendar(c => !c)}
+            >
+              {dateLabel}
+            </button>
+            <button className="plan-nav-btn" onClick={goNext}><ChevronRight /></button>
+
+            {showCalendar && (
+              <MiniCalendar
+                currentDate={date}
+                calendarMonth={calendarMonth}
+                onSelectDate={(d) => { setDate(d); setShowCalendar(false); }}
+                onPrevMonth={() => setCalendarMonth(m => subMonths(m, 1))}
+                onNextMonth={() => setCalendarMonth(m => addMonths(m, 1))}
+                view={view}
+              />
+            )}
+          </div>
+
+          <button className="plan-today-btn" onClick={goToday}>Aujourd'hui</button>
+
+          <button className="plan-icon-btn" onClick={handleRefresh} disabled={refreshing} title="Actualiser">
+            <RefreshIcon spinning={refreshing} />
+          </button>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <button className="btn btn-primary btn-sm" onClick={() => setShowAddModal(true)}>
+        <div className="plan-controls">
+          <button className="plan-block-btn" onClick={() => setShowBlockModal(true)}>
+            <BlockIcon /> Bloquer
+          </button>
+          <button className="plan-create-btn" onClick={() => setShowAddModal(true)}>
             <PlusIcon /> Nouveau RDV
           </button>
         </div>
-      </div>
-
-      <div className="planning-nav" style={{ marginBottom: '1rem' }}>
-        <button className="btn btn-ghost btn-icon" onClick={goPrev}><ChevronLeft /></button>
-        <button className="btn btn-ghost btn-sm" onClick={goToday}>Aujourd'hui</button>
-        <span className="planning-date" style={{ textTransform: 'capitalize' }}>{dateLabel}</span>
-        <button className="btn btn-ghost btn-icon" onClick={goNext}><ChevronRight /></button>
       </div>
 
       {error && <div className="alert alert-error">{error}</div>}
@@ -499,6 +614,218 @@ export default function Planning() {
 
       {renderDetailModal()}
       {renderAddModal()}
+
+      {showBlockModal && (
+        <BlockSlotModal
+          initialDate={format(date, 'yyyy-MM-dd')}
+          onClose={() => setShowBlockModal(false)}
+          onCreated={() => { setShowBlockModal(false); fetchData(); }}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ═══ Mini Calendar Picker ════════════════════════ */
+function MiniCalendar({ currentDate, calendarMonth, onSelectDate, onPrevMonth, onNextMonth, view }) {
+  const monthStart = startOfMonth(calendarMonth);
+  const monthEnd = endOfMonth(calendarMonth);
+  const dayNames = ['lu', 'ma', 'me', 'je', 've', 'sa', 'di'];
+
+  // Build grid: start from Monday of the week containing monthStart
+  const startDay = getDay(monthStart); // 0=Sun
+  const offset = startDay === 0 ? 6 : startDay - 1; // Monday-based offset
+  const gridStart = addDays(monthStart, -offset);
+
+  const days = [];
+  for (let i = 0; i < 42; i++) {
+    days.push(addDays(gridStart, i));
+  }
+
+  // Only show 5 or 6 rows as needed
+  const rows = [];
+  for (let r = 0; r < 6; r++) {
+    const week = days.slice(r * 7, r * 7 + 7);
+    // Skip row if all days are next month and it's row 5+
+    if (r >= 5 && !week.some(d => isSameMonth(d, calendarMonth))) break;
+    rows.push(week);
+  }
+
+  // Determine current week range for highlighting
+  const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
+  const weekEnd = addDays(weekStart, 6);
+
+  return (
+    <div className="mini-cal">
+      <div className="mini-cal-header">
+        <button className="mini-cal-nav" onClick={onPrevMonth}>
+          <ChevronLeft />
+        </button>
+        <span className="mini-cal-month">
+          {format(calendarMonth, 'MMMM yyyy', { locale: fr })}
+        </span>
+        <button className="mini-cal-nav" onClick={onNextMonth}>
+          <ChevronRight />
+        </button>
+      </div>
+
+      <div className="mini-cal-grid">
+        {dayNames.map(d => (
+          <div key={d} className="mini-cal-dayname">{d}</div>
+        ))}
+        {rows.flat().map((day, i) => {
+          const inMonth = isSameMonth(day, calendarMonth);
+          const today = isToday(day);
+          const isSelected = isSameDay(day, currentDate);
+          const inCurrentWeek = view === 'week' && day >= weekStart && day <= weekEnd;
+
+          return (
+            <button
+              key={i}
+              className={[
+                'mini-cal-day',
+                !inMonth && 'mini-cal-day--outside',
+                today && 'mini-cal-day--today',
+                isSelected && 'mini-cal-day--selected',
+                inCurrentWeek && 'mini-cal-day--week',
+              ].filter(Boolean).join(' ')}
+              onClick={() => onSelectDate(day)}
+            >
+              {format(day, 'd')}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ═══ Block Slot Modal Component ══════════════════ */
+function BlockSlotModal({ initialDate, onClose, onCreated }) {
+  const [date, setDate] = useState(initialDate || format(new Date(), 'yyyy-MM-dd'));
+  const [startTime, setStartTime] = useState('12:00');
+  const [endTime, setEndTime] = useState('14:00');
+  const [type, setType] = useState('personal');
+  const [reason, setReason] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  const typeLabels = {
+    break: 'Pause dejeuner',
+    personal: 'Perso / RDV',
+    closed: 'Ferme',
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!date || !startTime || !endTime) {
+      setError('Veuillez remplir tous les champs obligatoires.');
+      return;
+    }
+    if (startTime >= endTime) {
+      setError('L\'heure de fin doit etre apres l\'heure de debut.');
+      return;
+    }
+    setSaving(true);
+    setError('');
+    try {
+      await api.post('/admin/blocked-slots', {
+        date,
+        start_time: startTime,
+        end_time: endTime,
+        type,
+        reason: reason || typeLabels[type],
+      });
+      onCreated();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={e => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2 className="modal-title">Bloquer un creneau</h2>
+          <button className="modal-close" onClick={onClose}>
+            <CloseIcon />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="modal-body">
+            {error && <div className="alert alert-error">{error}</div>}
+
+            <div className="form-group">
+              <label className="form-label">Type</label>
+              <select
+                className="form-select"
+                value={type}
+                onChange={e => setType(e.target.value)}
+              >
+                <option value="break">Pause dejeuner</option>
+                <option value="personal">Perso / RDV</option>
+                <option value="closed">Ferme</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Date</label>
+              <input
+                className="form-input"
+                type="date"
+                value={date}
+                onChange={e => setDate(e.target.value)}
+              />
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label">Debut</label>
+                <input
+                  className="form-input"
+                  type="time"
+                  value={startTime}
+                  onChange={e => setStartTime(e.target.value)}
+                  min="08:00"
+                  max="20:30"
+                  step="300"
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Fin</label>
+                <input
+                  className="form-input"
+                  type="time"
+                  value={endTime}
+                  onChange={e => setEndTime(e.target.value)}
+                  min="08:00"
+                  max="21:00"
+                  step="300"
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Motif (optionnel)</label>
+              <input
+                className="form-input"
+                value={reason}
+                onChange={e => setReason(e.target.value)}
+                placeholder="Ex: RDV medical, courses..."
+              />
+            </div>
+          </div>
+
+          <div className="modal-footer">
+            <button type="button" className="btn btn-ghost" onClick={onClose}>Annuler</button>
+            <button type="submit" className="btn btn-primary" disabled={saving}>
+              {saving ? <span className="spinner-inline" /> : 'Bloquer'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

@@ -39,3 +39,8 @@ travail sourcil.jpg
 Vue photo pro clya qui travail zoom main outil.jpg
 WhatsApp Image 2026-02-27 at 16.54.46.jpeg
 Zoom sourcil browlift.jpg
+
+node_modules/
+dist/
+dashboard/node_modules/
+dashboard/dist/
