@@ -17,6 +17,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
     <link rel="stylesheet" href="/styles.css">
 
     <script type="application/ld+json">
@@ -79,6 +80,29 @@
     </script>
 </head>
 <body data-page="soins">
+
+    <!-- ========== DESKTOP NAVBAR ========== -->
+    <nav class="desktop-nav desktop-nav--solid" id="desktop-nav" aria-label="Navigation principale">
+        <div class="desktop-nav__inner">
+            <a href="/" class="desktop-nav__logo">
+                <span class="desktop-nav__logo-text">Maison du Regard</span>
+            </a>
+            <div class="desktop-nav__links">
+                <a href="/soins/" class="desktop-nav__link">Soins</a>
+                <a href="/salon/" class="desktop-nav__link">Le Salon</a>
+                <a href="/galerie/" class="desktop-nav__link">Galerie</a>
+                <a href="/avis/" class="desktop-nav__link">Avis</a>
+                <a href="/faq/" class="desktop-nav__link">FAQ</a>
+            </div>
+            <a class="desktop-nav__cta" href="https://iarabeauty.com/pro/maisonduregard" rel="nofollow noopener" target="_blank">
+                R&eacute;server
+            </a>
+        </div>
+    </nav>
+
+    <!-- ========== CUSTOM CURSOR ========== -->
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-follower" id="cursor-follower"></div>
 
     <!-- ========== PRELOADER ========== -->
     <div class="app">

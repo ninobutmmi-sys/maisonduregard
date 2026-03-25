@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Maison du Regard | Sourcils &amp; Cils Grenoble, Meylan, Corenc</title>
-    <meta name="description" content="Maison du Regard — sp&eacute;cialiste sourcils et cils &agrave; Corenc (Grenoble, Meylan). Restructuration, browlift, teinture, microblading, maquillage permanent, extensions cils. 5&#9733; sur Google (22 avis). R&eacute;servez en ligne.">
+    <meta name="description" content="Maison du Regard — sp&eacute;cialiste sourcils et cils &agrave; Corenc (Grenoble, Meylan). Restructuration, browlift, teinture, microblading, maquillage permanent, extensions cils. 5&#9733; sur Google (43 avis). R&eacute;servez en ligne.">
     <meta name="keywords" content="sourcils Grenoble, cils Grenoble, sourcils Meylan, browlift Meylan, restructuration sourcils Corenc, microblading Grenoble, maquillage permanent Grenoble, extensions cils Meylan, teinture sourcils, institut beaut&eacute; regard Grenoble, Maison du Regard">
     <meta name="theme-color" content="#FFF5F0">
     <meta name="google-site-verification" content="bckss31rFFZtJpesUV273RnBo8vx7lej17LL1jC1DKs">
     <meta property="og:title" content="Maison du Regard | Sourcils &amp; Cils Grenoble, Meylan, Corenc">
-    <meta property="og:description" content="Sp&eacute;cialiste sourcils &amp; cils &agrave; Corenc. Browlift, microblading, extensions. 5&#9733; (22 avis). R&eacute;servez en ligne.">
+    <meta property="og:description" content="Sp&eacute;cialiste sourcils &amp; cils &agrave; Corenc. Browlift, microblading, extensions. 5&#9733; (43 avis). R&eacute;servez en ligne.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://lamaisonduregard.fr">
     <meta property="og:image" content="https://lamaisonduregard.fr/assets/images/celia-closeup.jpg">
@@ -24,6 +24,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
 
     <link rel="stylesheet" href="/styles.css">
 
@@ -69,7 +70,7 @@
         "aggregateRating": {
             "@type": "AggregateRating",
             "ratingValue": "5.0",
-            "reviewCount": "22"
+            "reviewCount": "43"
         },
         "url": "https://lamaisonduregard.fr",
         "email": "maisonduregard38@gmail.com",
@@ -103,12 +104,35 @@
         </div>
     </div>
 
+    <!-- ========== DESKTOP NAVBAR ========== -->
+    <nav class="desktop-nav" id="desktop-nav" aria-label="Navigation principale">
+        <div class="desktop-nav__inner">
+            <a href="/" class="desktop-nav__logo">
+                <span class="desktop-nav__logo-text">Maison du Regard</span>
+            </a>
+            <div class="desktop-nav__links">
+                <a href="/soins/" class="desktop-nav__link">Soins</a>
+                <a href="/salon/" class="desktop-nav__link">Le Salon</a>
+                <a href="/galerie/" class="desktop-nav__link">Galerie</a>
+                <a href="/avis/" class="desktop-nav__link">Avis</a>
+                <a href="/faq/" class="desktop-nav__link">FAQ</a>
+            </div>
+            <a class="desktop-nav__cta" href="https://iarabeauty.com/pro/maisonduregard" rel="nofollow noopener" target="_blank">
+                R&eacute;server
+            </a>
+        </div>
+    </nav>
+
+    <!-- ========== CUSTOM CURSOR ========== -->
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-follower" id="cursor-follower"></div>
+
     <!-- ========== APP CONTAINER ========== -->
     <div id="app" class="app">
 
-        <!-- ===== PAGE: HOME ===== -->
-        <div class="page page--home" id="page-home">
-            <video class="hero__video" autoplay muted loop playsinline poster="assets/images/celia-closeup.jpg">
+        <!-- ===== SECTION: HERO ===== -->
+        <section class="hero" id="hero">
+            <video class="hero__video" id="hero-video" autoplay muted playsinline poster="assets/images/celia-closeup.jpg">
                 <source src="assets/video/trailer.mp4" type="video/mp4">
             </video>
             <div class="hero__photo" style="background-image: url('assets/images/celia-closeup.jpg')"></div>
@@ -116,19 +140,23 @@
 
             <div class="hero__content">
                 <div class="hero__bottom">
-                    <h1 class="hero__headline">Sp&eacute;cialiste sourcils &amp; cils<br><em>&agrave; Corenc, pr&egrave;s de Grenoble</em></h1>
-                    <p class="hero__tagline">Restructuration, browlift, microblading, extensions de cils</p>
+                    <h1 class="hero__headline">
+                        <span class="hero__headline-line">Sp&eacute;cialiste</span>
+                        <span class="hero__headline-line">sourcils &amp; cils</span>
+                        <em class="hero__headline-line">&agrave; Corenc, pr&egrave;s de Grenoble</em>
+                    </h1>
+                    <p class="hero__tagline">Restructuration &middot; Browlift &middot; Microblading &middot; Extensions de cils</p>
                     <a class="btn btn--cta hero__cta" href="https://iarabeauty.com/pro/maisonduregard" rel="nofollow noopener" target="_blank">
                         Prendre rendez-vous
                     </a>
                     <div class="hero__badge">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="#C9A96E"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                        <span>5.0 &middot; 22 avis Google</span>
+                        <span>5.0 &middot; 43 avis Google</span>
                     </div>
                 </div>
             </div>
-        </div>
 
+        </section>
 
     </div>
 
@@ -141,7 +169,7 @@
         </div>
     </div>
 
-    <!-- ===== BOTTOM NAV BAR ===== -->
+    <!-- ===== BOTTOM NAV BAR (mobile only) ===== -->
     <nav class="bottom-nav" aria-label="Navigation rapide">
         <a class="bottom-nav__item" href="/" data-nav="home">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>

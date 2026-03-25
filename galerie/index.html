@@ -17,14 +17,846 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
 
     <link rel="stylesheet" href="/styles.css">
+
+    <style>
+    /* ============================================================
+       GALERIE v3 — CSS Columns Masonry, Parallax, 3D Tilt
+       Zero-gap layout, spectacular GSAP animations
+       ============================================================ */
+
+    /* --- Hide old gallery classes if any bleed through --- */
+    .gallery, .gallery-hero { display: none !important; }
+
+    /* ==================== HEADER — IMMERSIVE ==================== */
+    [data-page="galerie"] .page__header {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 10;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 100%);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+
+    [data-page="galerie"] .page__header .page__back {
+        background: rgba(255,255,255,0.12);
+        border-color: rgba(255,255,255,0.2);
+        color: #fff;
+    }
+
+    [data-page="galerie"] .page__header .page__back:hover {
+        background: rgba(255,255,255,0.22);
+    }
+
+    [data-page="galerie"] .page__header .page__title {
+        color: #fff;
+    }
+
+    @media (min-width: 1024px) {
+        [data-page="galerie"] .page__header { display: none; }
+
+        [data-page="galerie"] .desktop-nav__link[href="/galerie/"] {
+            color: var(--color-gold) !important;
+        }
+        [data-page="galerie"] .desktop-nav__link[href="/galerie/"]::after {
+            width: 100%;
+            background: var(--color-gold);
+        }
+    }
+
+    /* ==================== HERO — FULL VIEWPORT MOBILE / SPLIT DESKTOP ==================== */
+    .galerie-hero {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+        height: 100svh;
+        min-height: 500px;
+        max-height: 900px;
+        overflow: hidden;
+    }
+
+    .galerie-hero__media {
+        position: absolute;
+        inset: 0;
+    }
+
+    .galerie-hero__video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        will-change: transform;
+        animation: heroKenBurns 25s ease-in-out alternate infinite;
+    }
+
+    @keyframes heroKenBurns {
+        0%   { transform: scale(1); }
+        100% { transform: scale(1.08); }
+    }
+
+    .galerie-hero__overlay {
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(to top, rgba(61,44,46,0.75) 0%, rgba(61,44,46,0.2) 35%, transparent 60%),
+            linear-gradient(to bottom, rgba(61,44,46,0.35) 0%, transparent 25%);
+    }
+
+    .galerie-hero__grain {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        opacity: 0.04;
+        pointer-events: none;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+        background-size: 256px;
+    }
+
+    .galerie-hero__content {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 0 var(--space-lg) 14vh;
+        text-align: center;
+    }
+
+    .galerie-hero__eyebrow {
+        font-family: var(--font-body);
+        font-size: 0.7rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.25em;
+        color: var(--color-gold-light);
+        margin-bottom: var(--space-md);
+        opacity: 0;
+    }
+
+    .galerie-hero__title {
+        font-family: var(--font-display);
+        font-size: clamp(2.8rem, 8vw, 5.5rem);
+        font-weight: 400;
+        color: #fff;
+        line-height: 1.05;
+        letter-spacing: -0.01em;
+        margin: 0;
+    }
+
+    .galerie-hero__title .word {
+        display: inline-block;
+        overflow: hidden;
+        vertical-align: bottom;
+    }
+
+    .galerie-hero__title .word-inner {
+        display: inline-block;
+        will-change: transform;
+    }
+
+    .galerie-hero__subtitle {
+        font-family: var(--font-accent);
+        font-style: italic;
+        font-size: clamp(1rem, 2.5vw, 1.35rem);
+        color: rgba(255,255,255,0.8);
+        margin-top: var(--space-md);
+        opacity: 0;
+    }
+
+    .galerie-hero__scroll {
+        position: absolute;
+        bottom: calc(var(--safe-bottom) + 24px);
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 3;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        color: rgba(255,255,255,0.5);
+        animation: scrollPulse 2.5s ease-in-out infinite;
+    }
+
+    .galerie-hero__scroll span {
+        font-family: var(--font-body);
+        font-size: 0.6rem;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+    }
+
+    @keyframes scrollPulse {
+        0%, 100% { opacity: 0.5; transform: translateX(-50%) translateY(0); }
+        50%      { opacity: 0.9; transform: translateX(-50%) translateY(5px); }
+    }
+
+    /* ==================== DESKTOP HERO — SPLIT 62/38 ==================== */
+    @media (min-width: 1024px) {
+        .galerie-hero {
+            display: flex;
+            height: 82vh;
+            max-height: 800px;
+            margin-top: 0;
+            background: var(--color-bg);
+        }
+
+        .galerie-hero__media {
+            position: relative;
+            width: 62%;
+            flex-shrink: 0;
+            border-radius: 0 0 var(--radius-xl) 0;
+            overflow: hidden;
+        }
+
+        .galerie-hero__content {
+            position: relative;
+            width: 38%;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 60px 56px;
+            text-align: left;
+            background: var(--color-bg);
+        }
+
+        .galerie-hero__eyebrow { color: var(--color-gold); }
+        .galerie-hero__title { color: var(--color-text); font-size: clamp(3rem, 4vw, 4.2rem); }
+        .galerie-hero__subtitle { color: var(--color-text-muted); }
+        .galerie-hero__scroll { display: none; }
+
+        .galerie-hero__overlay {
+            background:
+                linear-gradient(to top, rgba(61,44,46,0.4) 0%, transparent 40%),
+                radial-gradient(ellipse at 70% 80%, rgba(201,169,110,0.15) 0%, transparent 50%);
+        }
+    }
+
+    @media (min-width: 1440px) {
+        .galerie-hero__content { padding: 80px 72px; }
+        .galerie-hero__title { font-size: 4.5rem; }
+    }
+
+    /* ==================== HORIZONTAL STRIP ==================== */
+    .galerie-strip {
+        overflow: hidden;
+        padding: var(--space-md) 0;
+        background: var(--color-bg);
+    }
+
+    .galerie-strip__track {
+        display: flex;
+        gap: 6px;
+        width: max-content;
+        animation: stripScroll 35s linear infinite;
+    }
+
+    .galerie-strip__track:hover { animation-play-state: paused; }
+
+    .galerie-strip__item {
+        flex-shrink: 0;
+        width: 120px;
+        height: 80px;
+        border-radius: 6px;
+        overflow: hidden;
+        opacity: 0.65;
+        transition: opacity 0.3s, transform 0.3s;
+    }
+
+    .galerie-strip__item:hover {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+
+    .galerie-strip__item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    @keyframes stripScroll {
+        0%   { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+    }
+
+    @media (min-width: 1024px) {
+        .galerie-strip__item { width: 200px; height: 140px; }
+    }
+
+    /* ==================== DIVIDER + COUNTER ==================== */
+    .galerie-divider {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-md);
+        padding: var(--space-lg) var(--space-lg) var(--space-md);
+    }
+
+    .galerie-divider__line {
+        flex: 1;
+        max-width: 120px;
+        height: 1px;
+        background: linear-gradient(to right, transparent, var(--color-gold), transparent);
+        opacity: 0.4;
+    }
+
+    .galerie-divider__count {
+        font-family: var(--font-body);
+        font-size: 0.7rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        color: var(--color-gold);
+        white-space: nowrap;
+    }
+
+    .galerie-divider__count .count-number {
+        font-family: var(--font-display);
+        font-size: 1.1rem;
+        font-weight: 500;
+        vertical-align: baseline;
+    }
+
+    @media (min-width: 1024px) {
+        .galerie-divider { padding: var(--space-2xl) var(--space-lg) var(--space-lg); }
+        .galerie-divider__line { max-width: 180px; }
+    }
+
+    /* ==================== FILTERS ==================== */
+    .galerie-filters {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-sm);
+        padding: 0 var(--space-md) var(--space-lg);
+        flex-wrap: wrap;
+    }
+
+    .galerie-filter {
+        font-family: var(--font-body);
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--color-text-muted);
+        background: none;
+        border: 1px solid transparent;
+        padding: 8px 20px;
+        border-radius: var(--radius-full);
+        cursor: pointer;
+        transition: all 0.35s var(--ease-out);
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .galerie-filter:hover {
+        color: var(--color-text);
+        border-color: rgba(201,169,110,0.3);
+    }
+
+    .galerie-filter.active {
+        color: #fff;
+        background: linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-dark) 100%);
+        border-color: var(--color-gold);
+        box-shadow: 0 4px 16px rgba(201,169,110,0.3);
+    }
+
+    @media (min-width: 1024px) {
+        .galerie-filters { gap: var(--space-md); }
+        .galerie-filter { font-size: 0.72rem; padding: 10px 28px; }
+    }
+
+    /* ==================== FULL-WIDTH FEATURE IMAGE ==================== */
+    .galerie-feature {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        cursor: pointer;
+        margin-bottom: 3px;
+    }
+
+    .galerie-feature__inner {
+        position: relative;
+        width: 100%;
+        height: 55vw;
+        max-height: 500px;
+        overflow: hidden;
+    }
+
+    .galerie-feature__inner img {
+        width: 100%;
+        height: 110%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.7s var(--ease-out);
+        will-change: transform;
+    }
+
+    .galerie-feature:hover .galerie-feature__inner img {
+        transform: scale(1.04);
+    }
+
+    .galerie-feature::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 50%);
+        z-index: 1;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.5s var(--ease-out);
+    }
+
+    .galerie-feature:hover::before { opacity: 1; }
+
+    .galerie-feature__glass {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 2;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        padding: 20px;
+        opacity: 0;
+        transition: opacity 0.45s var(--ease-out);
+        pointer-events: none;
+    }
+
+    .galerie-feature:hover .galerie-feature__glass { opacity: 1; }
+
+    .galerie-feature__tag {
+        font-family: var(--font-body);
+        font-size: 0.6rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: #fff;
+        background: rgba(201,169,110,0.55);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        padding: 5px 14px;
+        border-radius: var(--radius-full);
+    }
+
+    .galerie-feature__expand {
+        width: 36px;
+        height: 36px;
+        background: rgba(255,255,255,0.15);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+    }
+
+    @media (min-width: 768px) {
+        .galerie-feature { margin-bottom: 10px; padding: 0 16px; }
+        .galerie-feature__inner { border-radius: var(--radius-md); height: 40vw; }
+    }
+
+    @media (min-width: 1024px) {
+        .galerie-feature { margin-bottom: 14px; padding: 0 32px; max-width: 1400px; margin-left: auto; margin-right: auto; }
+        .galerie-feature__inner { border-radius: var(--radius-md); height: 380px; }
+    }
+
+    /* ==================== MASONRY — CSS COLUMNS ==================== */
+    .galerie-masonry {
+        columns: 2;
+        column-gap: 3px;
+        padding: 0;
+    }
+
+    .galerie-masonry__item {
+        break-inside: avoid;
+        margin-bottom: 3px;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        border-radius: 0;
+        opacity: 0;
+        transform: scale(0.92);
+        transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
+        perspective: 800px;
+    }
+
+    .galerie-masonry__item.is-visible {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .galerie-masonry__item.filtered-out {
+        display: none;
+    }
+
+    /* --- Parallax inner container --- */
+    .galerie-masonry__inner {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .galerie-masonry__inner img,
+    .galerie-masonry__inner video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.7s var(--ease-out);
+        will-change: transform;
+    }
+
+    /* Images are slightly oversized for parallax */
+    .galerie-masonry__inner img {
+        height: 110%;
+        margin-top: -5%;
+    }
+
+    .galerie-masonry__item:hover .galerie-masonry__inner img,
+    .galerie-masonry__item:hover .galerie-masonry__inner video {
+        transform: scale(1.06);
+    }
+
+    /* --- Vignette on hover --- */
+    .galerie-masonry__item::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.35) 0%, transparent 55%);
+        z-index: 1;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.5s var(--ease-out);
+    }
+
+    .galerie-masonry__item:hover::before { opacity: 1; }
+
+    /* --- Glass overlay on hover --- */
+    .galerie-masonry__glass {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 2;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        padding: 12px;
+        opacity: 0;
+        transition: opacity 0.45s var(--ease-out);
+        pointer-events: none;
+    }
+
+    .galerie-masonry__item:hover .galerie-masonry__glass { opacity: 1; }
+
+    .galerie-masonry__tag {
+        font-family: var(--font-body);
+        font-size: 0.55rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: #fff;
+        background: rgba(201,169,110,0.55);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        padding: 4px 12px;
+        border-radius: var(--radius-full);
+        transform: translateY(6px);
+        transition: transform 0.45s var(--ease-out);
+    }
+
+    .galerie-masonry__item:hover .galerie-masonry__tag { transform: translateY(0); }
+
+    .galerie-masonry__expand {
+        width: 30px;
+        height: 30px;
+        background: rgba(255,255,255,0.15);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        transform: translateY(6px) scale(0.8);
+        transition: transform 0.45s var(--ease-out);
+    }
+
+    .galerie-masonry__item:hover .galerie-masonry__expand { transform: translateY(0) scale(1); }
+
+    /* --- Video play indicator --- */
+    .galerie-masonry__play {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 2;
+        width: 48px;
+        height: 48px;
+        background: rgba(255,255,255,0.15);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,0.25);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        transition: transform 0.4s var(--ease-out), background 0.4s;
+    }
+
+    .galerie-masonry__play svg { margin-left: 2px; }
+
+    .galerie-masonry__item:hover .galerie-masonry__play {
+        transform: translate(-50%, -50%) scale(1.1);
+        background: rgba(201,169,110,0.4);
+    }
+
+    .galerie-masonry__play-ring {
+        position: absolute;
+        inset: -3px;
+        border-radius: 50%;
+        border: 1px solid rgba(201,169,110,0.4);
+        animation: playRing 2s ease-out infinite;
+    }
+
+    @keyframes playRing {
+        0%   { transform: scale(1); opacity: 0.6; }
+        100% { transform: scale(1.4); opacity: 0; }
+    }
+
+    /* --- Mobile item heights (varied for masonry interest) --- */
+    .galerie-masonry__item--photo .galerie-masonry__inner { height: 55vw; }
+    .galerie-masonry__item--tall .galerie-masonry__inner { height: 70vw; }
+    .galerie-masonry__item--video .galerie-masonry__inner { height: 85vw; }
+
+    /* --- Tablet (768px-1023px) --- */
+    @media (min-width: 768px) {
+        .galerie-masonry {
+            columns: 3;
+            column-gap: 10px;
+            padding: 0 16px;
+        }
+
+        .galerie-masonry__item {
+            margin-bottom: 10px;
+            border-radius: var(--radius-md);
+        }
+
+        .galerie-masonry__item--photo .galerie-masonry__inner { height: 32vw; }
+        .galerie-masonry__item--tall .galerie-masonry__inner { height: 42vw; }
+        .galerie-masonry__item--video .galerie-masonry__inner { height: 50vw; }
+
+        .galerie-masonry__glass { padding: 14px; }
+        .galerie-masonry__tag { font-size: 0.6rem; }
+        .galerie-masonry__expand { width: 34px; height: 34px; }
+    }
+
+    /* --- Desktop (1024px+) --- */
+    @media (min-width: 1024px) {
+        .galerie-masonry {
+            columns: 4;
+            column-gap: 14px;
+            padding: 0 32px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .galerie-masonry__item {
+            margin-bottom: 14px;
+            border-radius: var(--radius-md);
+        }
+
+        .galerie-masonry__item--photo .galerie-masonry__inner { height: 240px; }
+        .galerie-masonry__item--tall .galerie-masonry__inner { height: 340px; }
+        .galerie-masonry__item--video .galerie-masonry__inner { height: 380px; }
+
+        .galerie-masonry__glass { padding: 16px; }
+        .galerie-masonry__tag { font-size: 0.6rem; padding: 5px 14px; }
+        .galerie-masonry__expand { width: 36px; height: 36px; }
+    }
+
+    @media (min-width: 1440px) {
+        .galerie-masonry__item--photo .galerie-masonry__inner { height: 280px; }
+        .galerie-masonry__item--tall .galerie-masonry__inner { height: 380px; }
+        .galerie-masonry__item--video .galerie-masonry__inner { height: 420px; }
+    }
+
+    /* ==================== CTA — FULL BLEED ==================== */
+    .galerie-cta {
+        position: relative;
+        padding: 80px var(--space-lg) calc(80px + var(--safe-bottom) + 80px);
+        overflow: hidden;
+        text-align: center;
+        margin-top: 3px;
+    }
+
+    .galerie-cta__bg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 120%;
+        top: -10%;
+        object-fit: cover;
+        will-change: transform;
+    }
+
+    .galerie-cta__overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(61,44,46,0.6);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+    }
+
+    .galerie-cta__content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .galerie-cta__eyebrow {
+        font-family: var(--font-body);
+        font-size: 0.65rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.25em;
+        color: var(--color-gold-light);
+        margin-bottom: var(--space-sm);
+    }
+
+    .galerie-cta__title {
+        font-family: var(--font-display);
+        font-size: clamp(1.6rem, 4vw, 2.8rem);
+        font-weight: 400;
+        color: #fff;
+        line-height: 1.2;
+        margin: 0 0 var(--space-sm);
+    }
+
+    .galerie-cta__subtitle {
+        font-family: var(--font-accent);
+        font-style: italic;
+        font-size: 1.05rem;
+        color: rgba(255,255,255,0.7);
+        margin-bottom: var(--space-xl);
+    }
+
+    .galerie-cta__btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-family: var(--font-body);
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: #fff;
+        background: linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-dark) 100%);
+        padding: 16px 36px;
+        border-radius: var(--radius-full);
+        text-decoration: none;
+        box-shadow: 0 8px 32px rgba(201,169,110,0.35);
+        transition: transform 0.35s var(--ease-out), box-shadow 0.35s;
+    }
+
+    .galerie-cta__btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 40px rgba(201,169,110,0.5);
+    }
+
+    @media (min-width: 1024px) {
+        .galerie-cta { padding: 120px var(--space-xl); margin-top: 14px; }
+    }
+
+    /* ==================== CUSTOM CURSOR — GALLERY ==================== */
+    @media (min-width: 1024px) {
+        .cursor-follower.cursor--gallery {
+            width: 80px !important;
+            height: 80px !important;
+            background: rgba(201,169,110,0.25) !important;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid rgba(201,169,110,0.3) !important;
+            mix-blend-mode: normal !important;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            opacity: 1 !important;
+        }
+
+        .cursor-follower.cursor--gallery span {
+            font-family: var(--font-body);
+            font-size: 0.6rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: #fff;
+            pointer-events: none;
+        }
+    }
+
+    /* ==================== 3D TILT (desktop only) ==================== */
+    @media (min-width: 1024px) {
+        .galerie-masonry__item,
+        .galerie-feature {
+            transform-style: preserve-3d;
+            transition: opacity 0.6s var(--ease-out), transform 0.4s var(--ease-out);
+        }
+
+        .galerie-masonry__item.is-visible {
+            transform: perspective(800px) rotateX(0deg) rotateY(0deg) scale(1);
+        }
+    }
+
+    /* ==================== REDUCED MOTION ==================== */
+    @media (prefers-reduced-motion: reduce) {
+        .galerie-hero__video { animation: none; }
+        .galerie-hero__scroll { animation: none; }
+        .galerie-strip__track { animation: none; }
+        .galerie-masonry__play-ring { animation: none; }
+        .galerie-masonry__item {
+            opacity: 1;
+            transform: none;
+            transition: none;
+        }
+        .galerie-masonry__inner img,
+        .galerie-masonry__inner video,
+        .galerie-feature__inner img {
+            transition: none;
+        }
+    }
+    </style>
 </head>
 <body data-page="galerie">
+
+    <!-- ========== DESKTOP NAVBAR ========== -->
+    <nav class="desktop-nav desktop-nav--solid" id="desktop-nav" aria-label="Navigation principale">
+        <div class="desktop-nav__inner">
+            <a href="/" class="desktop-nav__logo">
+                <span class="desktop-nav__logo-text">Maison du Regard</span>
+            </a>
+            <div class="desktop-nav__links">
+                <a href="/soins/" class="desktop-nav__link">Soins</a>
+                <a href="/salon/" class="desktop-nav__link">Le Salon</a>
+                <a href="/galerie/" class="desktop-nav__link">Galerie</a>
+                <a href="/avis/" class="desktop-nav__link">Avis</a>
+                <a href="/faq/" class="desktop-nav__link">FAQ</a>
+            </div>
+            <a class="desktop-nav__cta" href="https://iarabeauty.com/pro/maisonduregard" rel="nofollow noopener" target="_blank">R&eacute;server</a>
+        </div>
+    </nav>
+
+    <!-- ========== CUSTOM CURSOR ========== -->
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-follower" id="cursor-follower"></div>
+
     <div class="app">
         <div class="page page--sub">
 
@@ -36,46 +868,238 @@
                 <div class="page__header-spacer"></div>
             </header>
 
-            <div class="page__body">
+            <div class="page__body" style="padding-left:0; padding-right:0; padding-top:0; padding-bottom:0; max-width:none;">
 
-                <h1 class="page__title">Galerie de r&eacute;sultats sourcils et cils</h1>
+                <!-- ===== HERO — FULL VIEWPORT / SPLIT ===== -->
+                <section class="galerie-hero">
+                    <div class="galerie-hero__media">
+                        <video class="galerie-hero__video" autoplay muted loop playsinline>
+                            <source src="/assets/video/celia-travail.mp4" type="video/mp4">
+                        </video>
+                        <div class="galerie-hero__overlay"></div>
+                        <div class="galerie-hero__grain"></div>
+                    </div>
+                    <div class="galerie-hero__content">
+                        <p class="galerie-hero__eyebrow">Galerie de r&eacute;sultats</p>
+                        <h1 class="galerie-hero__title">
+                            <span class="word"><span class="word-inner">L'Art</span></span>
+                            <span class="word"> <span class="word-inner">du</span></span>
+                            <span class="word"> <span class="word-inner">Regard</span></span>
+                        </h1>
+                        <p class="galerie-hero__subtitle">Sourcils &amp; cils sublim&eacute;s &agrave; Corenc</p>
+                    </div>
+                    <div class="galerie-hero__scroll">
+                        <span>D&eacute;couvrir</span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                    </div>
+                </section>
 
-                <div class="gallery-hero">
-                    <video class="gallery-hero__video" autoplay muted loop playsinline>
-                        <source src="/assets/video/celia-travail.mp4" type="video/mp4">
-                    </video>
-                    <div class="gallery-hero__overlay">
-                        <p class="gallery-hero__subtitle">Chaque regard raconte une histoire</p>
+                <!-- ===== HORIZONTAL STRIP ===== -->
+                <section class="galerie-strip" aria-hidden="true">
+                    <div class="galerie-strip__track">
+                        <div class="galerie-strip__item"><img src="/assets/images/browlift-zoom.jpg" alt="" loading="lazy"></div>
+                        <div class="galerie-strip__item"><img src="/assets/images/resultat-1.jpg" alt="" loading="lazy"></div>
+                        <div class="galerie-strip__item"><img src="/assets/images/resultat-2.jpg" alt="" loading="lazy"></div>
+                        <div class="galerie-strip__item"><img src="/assets/images/resultat-3.jpg" alt="" loading="lazy"></div>
+                        <div class="galerie-strip__item"><img src="/assets/images/resultat-4.jpg" alt="" loading="lazy"></div>
+                        <div class="galerie-strip__item"><img src="/assets/images/resultat-5.jpg" alt="" loading="lazy"></div>
+                        <div class="galerie-strip__item"><img src="/assets/images/resultat-6.jpg" alt="" loading="lazy"></div>
+                        <div class="galerie-strip__item"><img src="/assets/images/presta-result.jpg" alt="" loading="lazy"></div>
+                        <div class="galerie-strip__item"><img src="/assets/images/presta-detail.jpg" alt="" loading="lazy"></div>
+                        <!-- Duplicate for seamless infinite scroll -->
+                        <div class="galerie-strip__item"><img src="/assets/images/browlift-zoom.jpg" alt="" loading="lazy"></div>
+                        <div class="galerie-strip__item"><img src="/assets/images/resultat-1.jpg" alt="" loading="lazy"></div>
+                        <div class="galerie-strip__item"><img src="/assets/images/resultat-2.jpg" alt="" loading="lazy"></div>
+                        <div class="galerie-strip__item"><img src="/assets/images/resultat-3.jpg" alt="" loading="lazy"></div>
+                        <div class="galerie-strip__item"><img src="/assets/images/resultat-4.jpg" alt="" loading="lazy"></div>
+                        <div class="galerie-strip__item"><img src="/assets/images/resultat-5.jpg" alt="" loading="lazy"></div>
+                        <div class="galerie-strip__item"><img src="/assets/images/resultat-6.jpg" alt="" loading="lazy"></div>
+                        <div class="galerie-strip__item"><img src="/assets/images/presta-result.jpg" alt="" loading="lazy"></div>
+                        <div class="galerie-strip__item"><img src="/assets/images/presta-detail.jpg" alt="" loading="lazy"></div>
+                    </div>
+                </section>
+
+                <!-- ===== DIVIDER + COUNTER ===== -->
+                <div class="galerie-divider">
+                    <div class="galerie-divider__line"></div>
+                    <span class="galerie-divider__count" id="galerie-count"><span class="count-number" id="count-number">0</span> r&eacute;alisations</span>
+                    <div class="galerie-divider__line"></div>
+                </div>
+
+                <!-- ===== FILTERS ===== -->
+                <div class="galerie-filters" role="tablist" aria-label="Filtrer par cat&eacute;gorie">
+                    <button class="galerie-filter active" data-filter="tous" role="tab" aria-selected="true" type="button">Tous</button>
+                    <button class="galerie-filter" data-filter="sourcils" role="tab" aria-selected="false" type="button">Sourcils</button>
+                    <button class="galerie-filter" data-filter="cils" role="tab" aria-selected="false" type="button">Cils</button>
+                </div>
+
+                <!-- ===== FULL-WIDTH FEATURE — Celia at work ===== -->
+                <div class="galerie-feature" data-category="sourcils" id="galerie-feature">
+                    <div class="galerie-feature__inner">
+                        <img src="/assets/images/celia-working-pro.jpg" alt="C&eacute;lia au travail, soin sourcils sous lumi&egrave;re annulaire" loading="lazy" data-lightbox>
+                    </div>
+                    <div class="galerie-feature__glass">
+                        <span class="galerie-feature__tag">En coulisses</span>
+                        <div class="galerie-feature__expand">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                        </div>
                     </div>
                 </div>
 
-                <div class="gallery">
-                    <div class="gallery__item"><img src="/assets/images/browlift-zoom.jpg" alt="R&eacute;sultat browlift sourcils Grenoble" loading="lazy" data-lightbox></div>
-                    <div class="gallery__item"><img src="/assets/images/resultat-1.jpg" alt="Sourcils parfaits apr&egrave;s restructuration Corenc" loading="lazy" data-lightbox></div>
-                    <div class="gallery__item"><img src="/assets/images/presta-celya.jpg" alt="Maquillage permanent sourcils Meylan" loading="lazy" data-lightbox></div>
-                    <div class="gallery__item"><img src="/assets/images/resultat-2.jpg" alt="Sourcils d&eacute;finis, regard sublim&eacute; Grenoble" loading="lazy" data-lightbox></div>
-                    <div class="gallery__item"><img src="/assets/images/cliente-satisfaite.jpg" alt="Cliente satisfaite apr&egrave;s soin regard Corenc" loading="lazy" data-lightbox></div>
-                    <div class="gallery__item"><img src="/assets/images/resultat-3.jpg" alt="Browlift naturel avant apr&egrave;s Meylan" loading="lazy" data-lightbox></div>
-                    <div class="gallery__item"><img src="/assets/images/sourcils-1.jpg" alt="Restructuration sourcils r&eacute;sultat Grenoble" loading="lazy" data-lightbox></div>
-                    <div class="gallery__item"><img src="/assets/images/resultat-4.jpg" alt="Browlift cliente r&eacute;sultat naturel Corenc" loading="lazy" data-lightbox></div>
-                    <div class="gallery__item"><img src="/assets/images/presta-result.jpg" alt="R&eacute;sultat microblading sourcils Grenoble" loading="lazy" data-lightbox></div>
-                    <div class="gallery__item"><img src="/assets/images/resultat-5.jpg" alt="Microblading sourcils avant apr&egrave;s Meylan" loading="lazy" data-lightbox></div>
-                    <div class="gallery__item"><img src="/assets/images/sourcils-2.jpg" alt="Sourcils sublim&eacute;s teinture Corenc" loading="lazy" data-lightbox></div>
-                    <div class="gallery__item"><img src="/assets/images/resultat-6.jpg" alt="Browlift gros plan regard intense Grenoble" loading="lazy" data-lightbox></div>
-                    <div class="gallery__item"><img src="/assets/images/sourcils-work.jpg" alt="Travail sourcils en cours salon Corenc" loading="lazy" data-lightbox></div>
-                    <div class="gallery__item"><img src="/assets/images/presta-detail.jpg" alt="D&eacute;tail extension cils volume russe Meylan" loading="lazy" data-lightbox></div>
-                    <div class="gallery__item"><img src="/assets/images/celia-working-pro.jpg" alt="C&eacute;lia au travail institut beaut&eacute; Corenc" loading="lazy" data-lightbox></div>
+                <!-- ===== MASONRY GRID — CSS COLUMNS ===== -->
+                <div class="galerie-masonry" id="galerie-masonry">
+
+                    <!-- 1. resultat-2.jpg — blonde close-up (sourcils) -->
+                    <div class="galerie-masonry__item galerie-masonry__item--photo" data-category="sourcils">
+                        <div class="galerie-masonry__inner">
+                            <img src="/assets/images/resultat-2.jpg" alt="Sourcils parfaits apr&egrave;s restructuration, cliente blonde" loading="lazy" data-lightbox>
+                        </div>
+                        <div class="galerie-masonry__glass">
+                            <span class="galerie-masonry__tag">Sourcils</span>
+                            <div class="galerie-masonry__expand"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></div>
+                        </div>
+                    </div>
+
+                    <!-- 2. presta-result.jpg — macro eye lashes (cils) -->
+                    <div class="galerie-masonry__item galerie-masonry__item--tall" data-category="cils">
+                        <div class="galerie-masonry__inner">
+                            <img src="/assets/images/presta-result.jpg" alt="Extension cils volume, gros plan macro" loading="lazy" data-lightbox>
+                        </div>
+                        <div class="galerie-masonry__glass">
+                            <span class="galerie-masonry__tag">Cils</span>
+                            <div class="galerie-masonry__expand"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></div>
+                        </div>
+                    </div>
+
+                    <!-- 3. resultat-1.jpg — dark hair woman (sourcils) -->
+                    <div class="galerie-masonry__item galerie-masonry__item--tall" data-category="sourcils">
+                        <div class="galerie-masonry__inner">
+                            <img src="/assets/images/resultat-1.jpg" alt="R&eacute;sultat microblading sourcils, regard sublim&eacute;" loading="lazy" data-lightbox>
+                        </div>
+                        <div class="galerie-masonry__glass">
+                            <span class="galerie-masonry__tag">Sourcils</span>
+                            <div class="galerie-masonry__expand"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></div>
+                        </div>
+                    </div>
+
+                    <!-- 4. galerie-1.mp4 — video sourcils -->
+                    <div class="galerie-masonry__item galerie-masonry__item--video" data-category="sourcils" data-lightbox-video="/assets/video/galerie-1.mp4">
+                        <div class="galerie-masonry__inner">
+                            <video src="/assets/video/galerie-1.mp4" autoplay muted loop playsinline preload="metadata"></video>
+                        </div>
+                        <div class="galerie-masonry__play">
+                            <div class="galerie-masonry__play-ring"></div>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        </div>
+                        <div class="galerie-masonry__glass">
+                            <span class="galerie-masonry__tag">Vid&eacute;o</span>
+                            <div class="galerie-masonry__expand"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></div>
+                        </div>
+                    </div>
+
+                    <!-- 5. resultat-4.jpg — woman with braid (sourcils) -->
+                    <div class="galerie-masonry__item galerie-masonry__item--photo" data-category="sourcils">
+                        <div class="galerie-masonry__inner">
+                            <img src="/assets/images/resultat-4.jpg" alt="Browlift sourcils, cliente sur table de soin" loading="lazy" data-lightbox>
+                        </div>
+                        <div class="galerie-masonry__glass">
+                            <span class="galerie-masonry__tag">Sourcils</span>
+                            <div class="galerie-masonry__expand"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></div>
+                        </div>
+                    </div>
+
+                    <!-- 6. resultat-3.jpg — both eyes from above (sourcils) -->
+                    <div class="galerie-masonry__item galerie-masonry__item--photo" data-category="sourcils">
+                        <div class="galerie-masonry__inner">
+                            <img src="/assets/images/resultat-3.jpg" alt="Sourcils naturels, browlift r&eacute;sultat vue de dessus" loading="lazy" data-lightbox>
+                        </div>
+                        <div class="galerie-masonry__glass">
+                            <span class="galerie-masonry__tag">Sourcils</span>
+                            <div class="galerie-masonry__expand"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></div>
+                        </div>
+                    </div>
+
+                    <!-- 7. browlift-zoom.jpg — macro eyebrow (sourcils) -->
+                    <div class="galerie-masonry__item galerie-masonry__item--tall" data-category="sourcils">
+                        <div class="galerie-masonry__inner">
+                            <img src="/assets/images/browlift-zoom.jpg" alt="Gros plan browlift sourcils, d&eacute;tail technique" loading="lazy" data-lightbox>
+                        </div>
+                        <div class="galerie-masonry__glass">
+                            <span class="galerie-masonry__tag">Sourcils</span>
+                            <div class="galerie-masonry__expand"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></div>
+                        </div>
+                    </div>
+
+                    <!-- 8. resultat-5.jpg — young woman striped top (sourcils) -->
+                    <div class="galerie-masonry__item galerie-masonry__item--photo" data-category="sourcils">
+                        <div class="galerie-masonry__inner">
+                            <img src="/assets/images/resultat-5.jpg" alt="Restructuration sourcils, jeune cliente r&eacute;sultat naturel" loading="lazy" data-lightbox>
+                        </div>
+                        <div class="galerie-masonry__glass">
+                            <span class="galerie-masonry__tag">Sourcils</span>
+                            <div class="galerie-masonry__expand"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></div>
+                        </div>
+                    </div>
+
+                    <!-- 9. galerie-2.mp4 — video cils -->
+                    <div class="galerie-masonry__item galerie-masonry__item--video" data-category="cils" data-lightbox-video="/assets/video/galerie-2.mp4">
+                        <div class="galerie-masonry__inner">
+                            <video src="/assets/video/galerie-2.mp4" autoplay muted loop playsinline preload="metadata"></video>
+                        </div>
+                        <div class="galerie-masonry__play">
+                            <div class="galerie-masonry__play-ring"></div>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        </div>
+                        <div class="galerie-masonry__glass">
+                            <span class="galerie-masonry__tag">Vid&eacute;o</span>
+                            <div class="galerie-masonry__expand"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></div>
+                        </div>
+                    </div>
+
+                    <!-- 10. resultat-6.jpg — woman with hat, dark (sourcils) -->
+                    <div class="galerie-masonry__item galerie-masonry__item--tall" data-category="sourcils">
+                        <div class="galerie-masonry__inner">
+                            <img src="/assets/images/resultat-6.jpg" alt="Sourcils d&eacute;finis, regard intense r&eacute;sultat browlift" loading="lazy" data-lightbox>
+                        </div>
+                        <div class="galerie-masonry__glass">
+                            <span class="galerie-masonry__tag">Sourcils</span>
+                            <div class="galerie-masonry__expand"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></div>
+                        </div>
+                    </div>
+
+                    <!-- 11. presta-detail.jpg — cils detail (cils) -->
+                    <div class="galerie-masonry__item galerie-masonry__item--photo" data-category="cils">
+                        <div class="galerie-masonry__inner">
+                            <img src="/assets/images/presta-detail.jpg" alt="D&eacute;tail extension cils volume russe, gros plan" loading="lazy" data-lightbox>
+                        </div>
+                        <div class="galerie-masonry__glass">
+                            <span class="galerie-masonry__tag">Cils</span>
+                            <div class="galerie-masonry__expand"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></div>
+                        </div>
+                    </div>
+
                 </div>
 
-                <div class="home-intro__links" style="margin: var(--space-xl) 0;">
-                    <a href="/soins/" class="btn btn--outline">Nos soins</a>
-                    <a href="/salon/" class="btn btn--outline">Le salon</a>
-                </div>
+                <!-- ===== CTA — FULL BLEED ===== -->
+                <section class="galerie-cta" id="galerie-cta">
+                    <img class="galerie-cta__bg" src="/assets/images/celia-closeup.jpg" alt="" loading="lazy">
+                    <div class="galerie-cta__overlay"></div>
+                    <div class="galerie-cta__content">
+                        <p class="galerie-cta__eyebrow">Envie du m&ecirc;me r&eacute;sultat ?</p>
+                        <h2 class="galerie-cta__title">Sublimez votre regard</h2>
+                        <p class="galerie-cta__subtitle">Prenez rendez-vous avec C&eacute;lia</p>
+                        <a class="galerie-cta__btn" href="https://iarabeauty.com/pro/maisonduregard" rel="nofollow noopener" target="_blank">
+                            R&eacute;server
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                        </a>
+                    </div>
+                </section>
 
             </div>
         </div>
     </div>
 
+    <!-- ========== LIGHTBOX ========== -->
     <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Galerie photo">
         <button class="lightbox__close" type="button" aria-label="Fermer">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
@@ -88,9 +1112,11 @@
         </button>
         <div class="lightbox__content">
             <img src="" alt="" class="lightbox__img" id="lightbox-img">
+            <video class="lightbox__video" id="lightbox-video" controls playsinline loop style="display:none"></video>
         </div>
     </div>
 
+    <!-- ========== COOKIE BANNER ========== -->
     <div class="cookie-banner" id="cookie-banner">
         <p>Ce site utilise des cookies techniques pour son bon fonctionnement.</p>
         <div class="cookie-banner__actions">
@@ -99,6 +1125,7 @@
         </div>
     </div>
 
+    <!-- ========== BOTTOM NAV ========== -->
     <nav class="bottom-nav" aria-label="Navigation rapide">
         <a class="bottom-nav__item" href="/" data-nav="home"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Accueil</span></a>
         <a class="bottom-nav__item" href="/soins/" data-nav="soins"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg><span>Soins</span></a>
@@ -108,5 +1135,304 @@
     </nav>
 
     <script src="/script.js"></script>
+    <script>
+    /* ========================================================
+       GALERIE v3 — Masonry, Parallax, 3D Tilt, Filters
+       GSAP + ScrollTrigger powered
+       ======================================================== */
+    (function () {
+        'use strict';
+
+        var TOTAL_ITEMS = 12;
+        var filters = document.querySelectorAll('.galerie-filter');
+        var masonryItems = document.querySelectorAll('.galerie-masonry__item');
+        var featureItem = document.getElementById('galerie-feature');
+        var countNumberEl = document.getElementById('count-number');
+        var countEl = document.getElementById('galerie-count');
+        var isDesktop = window.innerWidth >= 1024;
+        var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        /* ---------- 1. Wait for GSAP ---------- */
+        function init() {
+            if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+                /* Fallback: show everything immediately */
+                masonryItems.forEach(function (item) { item.classList.add('is-visible'); });
+                if (featureItem) featureItem.style.opacity = '1';
+                if (countNumberEl) countNumberEl.textContent = TOTAL_ITEMS;
+                return;
+            }
+
+            gsap.registerPlugin(ScrollTrigger);
+
+            /* ---------- 2. Hero text animation ---------- */
+            var heroTl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+            heroTl
+                .to('.galerie-hero__eyebrow', {
+                    y: 0, opacity: 1, duration: 0.8
+                }, 0.3)
+                .from('.galerie-hero__title .word-inner', {
+                    y: 60, opacity: 0, duration: 1, stagger: 0.15
+                }, 0.5)
+                .to('.galerie-hero__subtitle', {
+                    y: 0, opacity: 1, duration: 0.8
+                }, 1.1)
+                .from('.galerie-hero__scroll', {
+                    opacity: 0, duration: 0.6
+                }, 1.6);
+
+            /* ---------- 3. Strip fade in ---------- */
+            gsap.from('.galerie-strip', {
+                opacity: 0, duration: 0.8,
+                scrollTrigger: { trigger: '.galerie-strip', start: 'top 90%' }
+            });
+
+            /* ---------- 4. Divider lines ---------- */
+            gsap.from('.galerie-divider__line', {
+                scaleX: 0, duration: 0.8, ease: 'power2.out',
+                scrollTrigger: { trigger: '.galerie-divider', start: 'top 85%' }
+            });
+
+            /* ---------- 5. Counter animation ---------- */
+            var counterAnimated = false;
+            ScrollTrigger.create({
+                trigger: '.galerie-divider',
+                start: 'top 85%',
+                once: true,
+                onEnter: function () {
+                    if (counterAnimated) return;
+                    counterAnimated = true;
+                    var obj = { val: 0 };
+                    gsap.to(obj, {
+                        val: TOTAL_ITEMS,
+                        duration: 1.5,
+                        ease: 'power2.out',
+                        onUpdate: function () {
+                            if (countNumberEl) countNumberEl.textContent = Math.round(obj.val);
+                        }
+                    });
+                }
+            });
+
+            /* ---------- 6. Filter pills ---------- */
+            gsap.from('.galerie-filter', {
+                opacity: 0, y: 15, duration: 0.5, stagger: 0.08,
+                scrollTrigger: { trigger: '.galerie-filters', start: 'top 90%' }
+            });
+
+            /* ---------- 7. Feature image reveal ---------- */
+            if (featureItem) {
+                gsap.from(featureItem, {
+                    opacity: 0, y: 40, scale: 0.96, duration: 0.9, ease: 'power3.out',
+                    scrollTrigger: { trigger: featureItem, start: 'top 88%' }
+                });
+            }
+
+            /* ---------- 8. Masonry items scroll reveal (batch) ---------- */
+            if (!prefersReducedMotion) {
+                ScrollTrigger.batch(masonryItems, {
+                    start: 'top 92%',
+                    once: true,
+                    onEnter: function (batch) {
+                        batch.forEach(function (item, i) {
+                            setTimeout(function () {
+                                item.classList.add('is-visible');
+                            }, i * 80);
+                        });
+                    }
+                });
+            } else {
+                masonryItems.forEach(function (item) { item.classList.add('is-visible'); });
+            }
+
+            /* ---------- 9. Image parallax inside items ---------- */
+            if (!prefersReducedMotion) {
+                masonryItems.forEach(function (item) {
+                    var img = item.querySelector('img');
+                    if (!img) return;
+
+                    gsap.to(img, {
+                        y: '8%',
+                        ease: 'none',
+                        scrollTrigger: {
+                            trigger: item,
+                            start: 'top bottom',
+                            end: 'bottom top',
+                            scrub: 0.6
+                        }
+                    });
+                });
+
+                /* Feature image parallax */
+                if (featureItem) {
+                    var featureImg = featureItem.querySelector('img');
+                    if (featureImg) {
+                        gsap.to(featureImg, {
+                            y: '6%',
+                            ease: 'none',
+                            scrollTrigger: {
+                                trigger: featureItem,
+                                start: 'top bottom',
+                                end: 'bottom top',
+                                scrub: 0.6
+                            }
+                        });
+                    }
+                }
+            }
+
+            /* ---------- 10. CTA parallax ---------- */
+            var ctaBg = document.querySelector('.galerie-cta__bg');
+            if (ctaBg && !prefersReducedMotion) {
+                gsap.to(ctaBg, {
+                    y: '-10%',
+                    ease: 'none',
+                    scrollTrigger: {
+                        trigger: '.galerie-cta',
+                        start: 'top bottom',
+                        end: 'bottom top',
+                        scrub: 0.4
+                    }
+                });
+            }
+
+            gsap.from('.galerie-cta__content', {
+                opacity: 0, y: 30, duration: 0.8,
+                scrollTrigger: { trigger: '.galerie-cta', start: 'top 75%' }
+            });
+        }
+
+        /* ---------- 11. Filter logic with smooth transitions ---------- */
+        var allFilterableItems = [];
+        if (featureItem) allFilterableItems.push(featureItem);
+        masonryItems.forEach(function (item) { allFilterableItems.push(item); });
+
+        var isFiltering = false;
+
+        filters.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                if (isFiltering) return;
+                var filter = btn.dataset.filter;
+
+                filters.forEach(function (f) {
+                    f.classList.remove('active');
+                    f.setAttribute('aria-selected', 'false');
+                });
+                btn.classList.add('active');
+                btn.setAttribute('aria-selected', 'true');
+
+                isFiltering = true;
+
+                /* Phase 1: Fade out all visible items */
+                var currentlyVisible = allFilterableItems.filter(function (item) {
+                    return !item.classList.contains('filtered-out');
+                });
+
+                currentlyVisible.forEach(function (item) {
+                    item.style.opacity = '0';
+                    item.style.transform = 'scale(0.92)';
+                });
+
+                setTimeout(function () {
+                    /* Phase 2: Hide/show items */
+                    var visibleCount = 0;
+
+                    allFilterableItems.forEach(function (item) {
+                        var cat = item.dataset.category;
+                        var show = filter === 'tous' || cat === filter;
+                        if (show) {
+                            item.classList.remove('filtered-out');
+                            visibleCount++;
+                        } else {
+                            item.classList.add('filtered-out');
+                        }
+                    });
+
+                    /* Update counter */
+                    if (countNumberEl) countNumberEl.textContent = visibleCount;
+                    if (countEl) {
+                        var suffix = visibleCount > 1 ? 's' : '';
+                        countEl.innerHTML = '<span class="count-number" id="count-number">' + visibleCount + '</span> r\u00e9alisation' + suffix;
+                    }
+
+                    /* Phase 3: Stagger fade-in visible items */
+                    var nowVisible = allFilterableItems.filter(function (item) {
+                        return !item.classList.contains('filtered-out');
+                    });
+
+                    nowVisible.forEach(function (item, i) {
+                        setTimeout(function () {
+                            item.style.opacity = '1';
+                            item.style.transform = 'scale(1)';
+                            item.classList.add('is-visible');
+                        }, i * 60);
+                    });
+
+                    setTimeout(function () {
+                        isFiltering = false;
+                    }, nowVisible.length * 60 + 300);
+
+                }, 300);
+            });
+        });
+
+        /* ---------- 12. 3D tilt on desktop ---------- */
+        if (isDesktop && !prefersReducedMotion) {
+            var tiltItems = document.querySelectorAll('.galerie-masonry__item, .galerie-feature');
+
+            tiltItems.forEach(function (item) {
+                item.addEventListener('mousemove', function (e) {
+                    var rect = item.getBoundingClientRect();
+                    var x = e.clientX - rect.left;
+                    var y = e.clientY - rect.top;
+                    var centerX = rect.width / 2;
+                    var centerY = rect.height / 2;
+
+                    var rotateX = ((y - centerY) / centerY) * -4;
+                    var rotateY = ((x - centerX) / centerX) * 4;
+
+                    item.style.transform = 'perspective(800px) rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) scale(1.01)';
+                });
+
+                item.addEventListener('mouseleave', function () {
+                    item.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) scale(1)';
+                });
+            });
+        }
+
+        /* ---------- 13. Custom cursor enhancement ---------- */
+        var cursorFollower = document.getElementById('cursor-follower');
+        if (cursorFollower && isDesktop) {
+            var galleryTargets = document.querySelectorAll('.galerie-masonry__item, .galerie-feature');
+            galleryTargets.forEach(function (el) {
+                el.addEventListener('mouseenter', function () {
+                    cursorFollower.classList.add('cursor--gallery');
+                    cursorFollower.innerHTML = '<span>Voir</span>';
+                });
+                el.addEventListener('mouseleave', function () {
+                    cursorFollower.classList.remove('cursor--gallery');
+                    cursorFollower.innerHTML = '';
+                });
+            });
+        }
+
+        /* ---------- 14. Video hover play (backup for autoplay) ---------- */
+        document.querySelectorAll('.galerie-masonry__item video').forEach(function (video) {
+            var parent = video.closest('.galerie-masonry__item');
+            if (!parent) return;
+            parent.addEventListener('mouseenter', function () {
+                video.play().catch(function () {});
+            });
+        });
+
+        /* ---------- Init when GSAP is ready ---------- */
+        if (document.readyState === 'complete') {
+            init();
+        } else {
+            window.addEventListener('load', init);
+        }
+
+    })();
+    </script>
 </body>
 </html>
