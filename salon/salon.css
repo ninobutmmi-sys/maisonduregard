@@ -1,0 +1,528 @@
+/* ========================================================
+   SALON PAGE — Premium Desktop Layout
+   ======================================================== */
+
+/* --- Hero --- */
+.salon-hero {
+    position: relative;
+    width: 100%;
+    height: 50vh;
+    min-height: 320px;
+    overflow: hidden;
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+.salon-hero__img-wrap {
+    position: absolute;
+    inset: 0;
+}
+
+.salon-hero__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 35%;
+}
+
+.salon-hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(20, 12, 10, 0.85) 0%, rgba(20, 12, 10, 0.2) 50%, rgba(20, 12, 10, 0.1) 100%);
+}
+
+.salon-hero__content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: var(--space-2xl) var(--space-lg);
+    z-index: 1;
+}
+
+.salon-hero__eyebrow {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+    margin-bottom: var(--space-sm);
+}
+
+.salon-hero__title {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 7vw, 64px);
+    font-weight: 400;
+    line-height: 1.1;
+    color: #fff;
+    margin-bottom: var(--space-sm);
+}
+
+.salon-hero__subtitle {
+    font-family: var(--font-accent);
+    font-size: 16px;
+    font-style: italic;
+    color: rgba(237, 232, 224, 0.6);
+    letter-spacing: 0.03em;
+}
+
+/* --- Body override --- */
+.salon-body {
+    padding-top: var(--space-2xl);
+}
+
+/* --- About Célia --- */
+.salon-about {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+    margin-bottom: var(--space-3xl);
+}
+
+.salon-about__portrait {
+    position: relative;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+}
+
+.salon-about__portrait img {
+    width: 100%;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    border-radius: var(--radius-xl);
+}
+
+.salon-about__portrait-accent {
+    position: absolute;
+    inset: 12px -12px -12px 12px;
+    border: 1px solid var(--color-gold);
+    border-radius: var(--radius-xl);
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.salon-about__heading {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 400;
+    color: var(--color-text);
+    margin-bottom: var(--space-lg);
+    line-height: 1.2;
+}
+
+.salon-about__text p {
+    font-family: var(--font-accent);
+    font-size: 17px;
+    line-height: 1.8;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-md);
+}
+
+.salon-about__text p strong {
+    color: var(--color-text);
+    font-weight: 500;
+}
+
+.salon-about__stats {
+    display: flex;
+    gap: var(--space-lg);
+    padding: var(--space-lg) 0;
+    margin-top: var(--space-lg);
+    border-top: 1px solid rgba(201, 169, 110, 0.15);
+}
+
+.salon-about__stat {
+    text-align: center;
+    flex: 1;
+}
+
+.salon-about__stat-num {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 600;
+    color: var(--color-gold);
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.salon-about__stat-label {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+}
+
+/* --- L'espace / Gallery --- */
+.salon-space {
+    margin-bottom: var(--space-3xl);
+}
+
+.salon-space__header {
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+}
+
+.salon-space__heading {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 400;
+    color: var(--color-text);
+    line-height: 1.2;
+    margin-bottom: var(--space-md);
+}
+
+.salon-space__heading em {
+    display: block;
+    font-family: var(--font-accent);
+    font-style: italic;
+    color: var(--color-gold);
+    font-size: 1.05em;
+}
+
+.salon-space__desc {
+    font-family: var(--font-accent);
+    font-size: 16px;
+    font-style: italic;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.salon-space__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+}
+
+.salon-space__photo {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.salon-space__photo img {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    transition: transform 0.7s var(--ease-out);
+}
+
+.salon-space__photo:hover img {
+    transform: scale(1.04);
+}
+
+.salon-space__label {
+    position: absolute;
+    bottom: var(--space-md);
+    left: var(--space-md);
+    font-family: var(--font-accent);
+    font-size: 14px;
+    font-style: italic;
+    color: #fff;
+    background: rgba(30, 20, 18, 0.55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 6px 16px;
+    border-radius: var(--radius-full);
+}
+
+/* --- Contact section --- */
+.salon-contact {
+    margin-bottom: var(--space-3xl);
+}
+
+.salon-contact__header {
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+}
+
+.salon-contact__layout {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+}
+
+.salon-contact__map-wrap {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.salon-contact__map-wrap #contact-map {
+    width: 100%;
+    height: 260px;
+    border-radius: var(--radius-lg);
+}
+
+.salon-contact__info-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+/* --- Info Cards --- */
+.salon-info-card {
+    display: flex;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    background: var(--color-bg-elevated);
+    border: 1px solid rgba(201, 169, 110, 0.1);
+    border-radius: var(--radius-lg);
+    transition: border-color 0.3s, transform 0.3s;
+}
+
+.salon-info-card:hover {
+    border-color: rgba(201, 169, 110, 0.25);
+    transform: translateY(-2px);
+}
+
+.salon-info-card__icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(201, 169, 110, 0.08);
+    border: 1px solid rgba(201, 169, 110, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--color-gold);
+}
+
+.salon-info-card__body {
+    flex: 1;
+    min-width: 0;
+}
+
+.salon-info-card__body h4 {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text);
+    margin-bottom: 6px;
+}
+
+.salon-info-card__body p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    margin-bottom: 6px;
+}
+
+.salon-info-card__note {
+    font-size: 12px;
+    color: var(--color-gold-dark);
+    font-style: italic;
+}
+
+.salon-info-card__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: var(--color-gold-dark);
+    text-decoration: none;
+    transition: color 0.2s;
+    margin-top: 4px;
+}
+
+.salon-info-card__link:hover {
+    color: var(--color-gold);
+}
+
+.salon-info-card__link + .salon-info-card__link {
+    display: flex;
+    margin-top: 8px;
+}
+
+/* --- Hours --- */
+.salon-hours__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #4ade80;
+    background: rgba(74, 222, 128, 0.08);
+    border: 1px solid rgba(74, 222, 128, 0.15);
+    border-radius: var(--radius-full);
+    padding: 4px 12px;
+    margin-bottom: var(--space-md);
+}
+
+.salon-hours__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #4ade80;
+    animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.salon-hours__grid {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 6px 16px;
+}
+
+.salon-hours__day {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.salon-hours__time {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    text-align: right;
+}
+
+.salon-hours__day--off,
+.salon-hours__time--off {
+    opacity: 0.4;
+}
+
+/* --- CTA --- */
+.salon-cta {
+    margin-bottom: var(--space-xl);
+}
+
+.salon-cta__inner {
+    text-align: center;
+    padding: var(--space-2xl) var(--space-lg);
+    background: linear-gradient(135deg, rgba(201, 169, 110, 0.06) 0%, rgba(252, 182, 159, 0.08) 100%);
+    border: 1px solid rgba(201, 169, 110, 0.12);
+    border-radius: var(--radius-xl);
+}
+
+.salon-cta__title {
+    font-family: var(--font-display);
+    font-size: clamp(22px, 3vw, 32px);
+    font-weight: 400;
+    color: var(--color-text);
+    margin-bottom: var(--space-lg);
+    line-height: 1.3;
+}
+
+/* ========================================
+   DESKTOP (1024px+)
+   ======================================== */
+
+@media (min-width: 1024px) {
+
+    .salon-body {
+        max-width: 1200px;
+        padding: var(--space-3xl) var(--space-xl);
+    }
+
+    /* Hero — full width, taller */
+    .salon-hero {
+        height: 65vh;
+        min-height: 480px;
+        border-radius: 0;
+        margin: 0 calc(-50vw + 50%);
+        width: 100vw;
+    }
+
+    .salon-hero__content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: var(--space-3xl) var(--space-2xl);
+    }
+
+    .salon-hero__eyebrow { font-size: 11px; }
+    .salon-hero__subtitle { font-size: 18px; }
+
+    /* About — side by side */
+    .salon-about {
+        flex-direction: row;
+        align-items: center;
+        gap: 80px;
+    }
+
+    .salon-about__portrait {
+        flex: 0 0 380px;
+        max-width: 380px;
+    }
+
+    .salon-about__portrait-accent {
+        inset: 20px -20px -20px 20px;
+    }
+
+    .salon-about__text {
+        flex: 1;
+    }
+
+    .salon-about__text p { font-size: 18px; }
+
+    .salon-about__stat-num { font-size: 44px; }
+
+    /* Space gallery — asymmetric grid */
+    .salon-space__grid {
+        grid-template-columns: 1.2fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        gap: var(--space-lg);
+    }
+
+    .salon-space__photo--large {
+        grid-row: span 2;
+    }
+
+    .salon-space__photo img {
+        height: 100%;
+        min-height: 300px;
+    }
+
+    .salon-space__photo--large img {
+        min-height: 100%;
+    }
+
+    /* Contact — map left, info right */
+    .salon-contact__layout {
+        flex-direction: row;
+        gap: var(--space-2xl);
+        align-items: flex-start;
+    }
+
+    .salon-contact__map-col {
+        flex: 1.2;
+        position: sticky;
+        top: 100px;
+    }
+
+    .salon-contact__map-wrap #contact-map {
+        height: 440px;
+    }
+
+    .salon-contact__info-col {
+        flex: 1;
+    }
+
+    /* CTA wider */
+    .salon-cta__inner {
+        padding: var(--space-3xl);
+    }
+}
+
+/* ========================================
+   LARGE DESKTOP (1400px+)
+   ======================================== */
+
+@media (min-width: 1400px) {
+    .salon-body { max-width: 1300px; }
+
+    .salon-about { gap: 120px; }
+    .salon-about__portrait { flex: 0 0 420px; max-width: 420px; }
+
+    .salon-hero { height: 70vh; }
+
+    .salon-contact__map-wrap #contact-map { height: 520px; }
+}
