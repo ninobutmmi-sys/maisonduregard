@@ -42,11 +42,11 @@ INSERT INTO services (name, category, description, duration, price, color, is_ac
 
 -- CILS (category: cils)
 INSERT INTO services (name, category, description, duration, price, color, is_active, is_popular, sort_order) VALUES
-  ('Rehaussement de cils', 'cils', 'Lissage permanent des cils', 60, 5000, '#B5838D', true, true, 18),
-  ('Rehaussement + Teinture cils', 'cils', 'Rehaussement avec coloration', 75, 5500, '#B5838D', true, true, 19),
-  ('Teinture cils', 'cils', 'Coloration des cils', 20, 1500, '#B5838D', true, false, 20),
-  ('Extension cils classique', 'cils', 'Pose complète extensions cil à cil', 120, 8000, '#B5838D', true, false, 21),
-  ('Remplissage extensions (< 3 sem.)', 'cils', 'Remplissage extensions de cils', 60, 4500, '#B5838D', true, false, 22);
+  ('Lashlift Coréen', 'cils', 'Rehausse les cils naturels avec des formules douces respectant la fibre du cil. Résultat : cils liftés, brillants et souples, effet naturel longue durée.', 45, 5500, '#B5838D', true, true, 18),
+  ('Lashlift Coréen + Teinture', 'cils', 'Lashlift coréen combiné avec teinture pour un regard intensifié. Formules douces, effet naturel longue durée.', 60, 6000, '#B5838D', true, true, 19),
+  ('Teinture cils', 'cils', 'Coloration des cils', 20, 1500, '#B5838D', true, false, 22),
+  ('Extension cils classique', 'cils', 'Pose complète extensions cil à cil', 120, 8000, '#B5838D', true, false, 23),
+  ('Remplissage extensions (< 3 sem.)', 'cils', 'Remplissage extensions de cils', 60, 4500, '#B5838D', true, false, 24);
 
 -- ============================================
 -- Schedules (0=Monday ... 6=Sunday)
